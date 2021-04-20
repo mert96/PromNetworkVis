@@ -1,5 +1,5 @@
 import {Component, OnInit} from '@angular/core';
-import {FormBuilder, FormGroup, Validators} from '@angular/forms';
+import {FormBuilder, FormControl, FormGroup, Validators} from '@angular/forms';
 
 @Component({
   selector: 'app-settings',
@@ -7,10 +7,11 @@ import {FormBuilder, FormGroup, Validators} from '@angular/forms';
   styleUrls: ['./settings.component.scss']
 })
 export class SettingsComponent implements OnInit {
-
+  private numberOfCategories = 20;
   categoryForm: FormGroup;
+  activeCategories: boolean[] = new Array(this.numberOfCategories);
 
-  constructor(formBuilder: FormBuilder) {
+  constructor(private formBuilder: FormBuilder) {
     this.categoryForm = formBuilder.group({
         sfVitality: [true, Validators.required],
         sfPhysicalFunctioning: [true, Validators.required],
@@ -37,9 +38,19 @@ export class SettingsComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.refresh();
   }
 
   refresh(): void {
+    if (this.categoryForm.valid) {
+      let i = 0;
+      for (const field in this.categoryForm.controls){
+        if (this.categoryForm.controls.hasOwnProperty(field)){
+          this.activeCategories[i] = this.categoryForm.controls[`${field}`].value;
+          i++;
+        }
+      }
+    }
   }
 
 }
