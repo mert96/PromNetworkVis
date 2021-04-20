@@ -1,0 +1,118 @@
+<div class="container">
+  <form [formGroup]="categoryForm" (ngSubmit)="refresh()" class="form-horizontal">
+    <div class="row">
+      <div class="col form-control-sm">
+        <div>
+          <h3>SF-36</h3>
+        </div>
+        <div class="form-group my-1">
+          <label for="sf1"><input id="sf1" formControlName="sfVitality" type="checkbox">
+            vitality</label>
+        </div>
+
+        <div class="form-group my-1">
+          <label for="sf2"><input id="sf2" formControlName="sfPhysicalFunctioning" type="checkbox">
+            physical functioning</label>
+        </div>
+
+        <div class="form-group my-1">
+          <label for="sf3"><input id="sf3" formControlName="sfBodilyPain" type="checkbox">
+            bodily pain</label>
+        </div>
+
+        <div class="form-group my-1">
+          <label for="sf4"><input id="sf4" formControlName="sfGeneralHealthPerceptions" type="checkbox">
+            general health perceptions</label>
+        </div>
+
+        <div class="form-group my-1">
+          <label for="sf5"><input id="sf5" formControlName="sfPhysicalRoleFunctioning" type="checkbox">
+            physical role functioning</label>
+        </div>
+
+        <div class="form-group my-1">
+          <label for="sf6"><input id="sf6" formControlName="sfSocialRoleFunctioning" type="checkbox">
+            social role functioning</label>
+        </div>
+
+        <div class="form-group my-1">
+          <label for="sf7"><input id="sf7" formControlName="sfEmotionalRoleFunctioning" type="checkbox">
+            emotional role functioning</label>
+        </div>
+
+        <div class="form-group my-1">
+          <label for="sf8"><input id="sf8" formControlName="sfMentalHealth" type="checkbox">
+            mental health</label>
+        </div>
+      </div>
+      <div class="col form-control-sm">
+        <div>
+          <h3>VFQ-25</h3>
+        </div>
+        <div class="form-group my-1">
+          <label for="vfq1"><input id="vfq1" formControlName="vfqGeneralHealth" type="checkbox">
+            general health</label>
+        </div>
+
+        <div class="form-group my-1">
+          <label for="vfq2"><input id="vfq2" formControlName="vfqGeneralVision" type="checkbox">
+            general vision</label>
+        </div>
+
+        <div class="form-group my-1">
+          <label for="vfq3"><input id="vfq3" formControlName="vfqOcularPain" type="checkbox">
+            ocular pain</label>
+        </div>
+
+        <div class="form-group my-1">
+          <label for="vfq4"><input id="vfq4" formControlName="vfqNearActivities" type="checkbox">
+            near activities</label>
+        </div>
+
+        <div class="form-group my-1">
+          <label for="vfq5"><input id="vfq5" formControlName="vfqDistanceActivities" type="checkbox">
+            distance activities</label>
+        </div>
+
+        <div class="form-group my-1">
+          <label for="vfq6"><input id="vfq6" formControlName="vfqSocialFunctioning" type="checkbox">
+            social functioning</label>
+        </div>
+
+        <div class="form-group my-1">
+          <label for="vfq7"><input id="vfq7" formControlName="vfqMentalHealth" type="checkbox">
+            mental health</label>
+        </div>
+
+        <div class="form-group my-1">
+          <label for="vfq8"><input id="vfq8" formControlName="vfqRoleDifficulties" type="checkbox">
+            role difficulties</label>
+        </div>
+
+        <div class="form-group my-1">
+          <label for="vfq9"><input id="vfq9" formControlName="vfqDependency" type="checkbox">
+            dependency</label>
+        </div>
+
+        <div class="form-group my-1">
+          <label for="vfq10"><input id="vfq10" formControlName="vfqDriving" type="checkbox">
+            driving</label>
+        </div>
+
+        <div class="form-group my-1">
+          <label for="vfq11"><input id="vfq11" formControlName="vfqColorVision" type="checkbox">
+            color vision</label>
+        </div>
+
+        <div class="form-group my-1">
+          <label for="vfq12"><input id="vfq12" formControlName="vfqPeripheralVision" type="checkbox">
+            peripheral vision</label>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button (click)="refresh()" class="btn btn-success" type="button">Refresh</button>
+    </div>
+  </form>
+</div>
