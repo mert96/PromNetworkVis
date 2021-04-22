@@ -1,5 +1,5 @@
 import {Component, OnInit} from '@angular/core';
-import {FormBuilder, FormControl, FormGroup, Validators} from '@angular/forms';
+import {FormBuilder, FormGroup, Validators} from '@angular/forms';
 
 @Component({
   selector: 'app-settings',
@@ -38,14 +38,17 @@ export class SettingsComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.refresh();
+    this.refreshCategories();
   }
 
-  refresh(): void {
+  /**
+   * updates which categories are chosen by the user and stores it in an array (activeCategories)
+   */
+  refreshCategories(): void {
     if (this.categoryForm.valid) {
       let i = 0;
-      for (const field in this.categoryForm.controls){
-        if (this.categoryForm.controls.hasOwnProperty(field)){
+      for (const field in this.categoryForm.controls) {
+        if (this.categoryForm.controls.hasOwnProperty(field)) {
           this.activeCategories[i] = this.categoryForm.controls[`${field}`].value;
           i++;
         }
@@ -53,4 +56,44 @@ export class SettingsComponent implements OnInit {
     }
   }
 
+  /**
+   * transform each row in csv string into an object
+   * @param data: csv file as string
+   * @param delimiter: symbol which separates elements
+   */
+  CsvToJSON(data: string, delimiter = ';'): any{
+    const lines = data.split('\n');
+
+    const result = [];
+
+    const headers = lines[0].split(delimiter);
+
+    for (let i = 1; i < lines.length; i++){
+
+      const obj: any = {};
+      const currentLine = lines[i].split(delimiter);
+
+      for (let j = 0; j < headers.length; j++){
+        obj[headers[j]] = currentLine[j];
+      }
+
+      result.push(obj);
+
+    }
+    return result;
+  }
+
+  /**
+   * transforms the input file into a string and passes it over to CsvToJSON.
+   * @param fileInput csv file chosen by user
+   */
+  readCsv(fileInput: any): void {
+    const fileRead = fileInput.target.files[0];
+
+    const reader: FileReader = new FileReader();
+    reader.readAsText(fileRead);
+    reader.onload = () => {
+      console.log(this.CsvToJSON(reader.result as string)[0].REGION);
+    };
+  }
 }
