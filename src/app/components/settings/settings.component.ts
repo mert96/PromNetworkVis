@@ -60,6 +60,7 @@ export class SettingsComponent implements OnInit {
           i++;
         }
       }
+      // start calculation of DoS if a csv file was read.
     }
   }
 
@@ -93,6 +94,7 @@ export class SettingsComponent implements OnInit {
    * @param fileInput csv file chosen by user
    */
   readCsv(fileInput: any): void {
+    this.resetPatientData();
     const fileRead = fileInput.target.files[0];
     const reader: FileReader = new FileReader();
     reader.readAsText(fileRead);
@@ -102,6 +104,15 @@ export class SettingsComponent implements OnInit {
       console.log(this.studies);
       console.log(this.patients);
     };
+  }
+
+  /**
+   * resets previous patient data to make space for data from new csv file
+   */
+  resetPatientData(): void {
+    this.visits = [];
+    this.patients = [];
+    this.studies = [];
   }
 
   /**
