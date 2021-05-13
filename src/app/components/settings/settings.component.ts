@@ -22,26 +22,48 @@ export class SettingsComponent implements OnInit {
               private patientData: PatientData,
               private constants: GlobalConstants) {
     this.categoryForm = formBuilder.group({
-        sfVitality: [true, Validators.required],
-        sfPhysicalFunctioning: [true, Validators.required],
-        sfBodilyPain: [true, Validators.required],
-        sfGeneralHealthPerceptions: [true, Validators.required],
-        sfPhysicalRoleFunctioning: [true, Validators.required],
-        sfSocialRoleFunctioning: [true, Validators.required],
-        sfEmotionalRoleFunctioning: [true, Validators.required],
-        sfMentalHealth: [true, Validators.required],
-        vfqGeneralHealth: [true, Validators.required],
-        vfqGeneralVision: [true, Validators.required],
-        vfqOcularPain: [true, Validators.required],
-        vfqNearActivities: [true, Validators.required],
-        vfqDistanceActivities: [true, Validators.required],
-        vfqSocialFunctioning: [true, Validators.required],
-        vfqMentalHealth: [true, Validators.required],
-        vfqRoleDifficulties: [true, Validators.required],
-        vfqDependency: [true, Validators.required],
-        vfqDriving: [true, Validators.required],
-        vfqColorVision: [true, Validators.required],
-        vfqPeripheralVision: [true, Validators.required]
+        QSVT: [true, Validators.required],  // SF36
+        QSPF: [true, Validators.required],
+        QSBP: [true, Validators.required],
+        QSGP: [true, Validators.required],
+        QSRP: [true, Validators.required],
+        QSSO: [true, Validators.required],
+        QSRE: [true, Validators.required],
+        QSME: [true, Validators.required],
+        QSBGH: [true, Validators.required], // VFQ25
+        QSBGV: [true, Validators.required],
+        QSOP: [true, Validators.required],
+        QSNA: [true, Validators.required],
+        QSDA: [true, Validators.required],
+        QSSF: [true, Validators.required],
+        QSMH: [true, Validators.required],
+        QSRD: [true, Validators.required],
+        QSDP: [true, Validators.required],
+        QSDV: [true, Validators.required],
+        QSCV: [true, Validators.required],
+        QSPV: [true, Validators.required]
+      /*
+      sfVitality: [true, Validators.required],
+      sfPhysicalFunctioning: [true, Validators.required],
+      sfBodilyPain: [true, Validators.required],
+      sfGeneralHealthPerceptions: [true, Validators.required],
+      sfPhysicalRoleFunctioning: [true, Validators.required],
+      sfSocialRoleFunctioning: [true, Validators.required],
+      sfEmotionalRoleFunctioning: [true, Validators.required],
+      sfMentalHealth: [true, Validators.required],
+      vfqGeneralHealth: [true, Validators.required],
+      vfqGeneralVision: [true, Validators.required],
+      vfqOcularPain: [true, Validators.required],
+      vfqNearActivities: [true, Validators.required],
+      vfqDistanceActivities: [true, Validators.required],
+      vfqSocialFunctioning: [true, Validators.required],
+      vfqMentalHealth: [true, Validators.required],
+      vfqRoleDifficulties: [true, Validators.required],
+      vfqDependency: [true, Validators.required],
+      vfqDriving: [true, Validators.required],
+      vfqColorVision: [true, Validators.required],
+      vfqPeripheralVision: [true, Validators.required]
+      */
       }
     );
   }
@@ -58,12 +80,12 @@ export class SettingsComponent implements OnInit {
       let i = 0;
       for (const field in this.categoryForm.controls) {
         if (this.categoryForm.controls.hasOwnProperty(field)) {
-          this.patientData.activeCategories[i] = this.categoryForm.controls[`${field}`].value;
+          this.patientData.activeCategories.set(field, this.categoryForm.controls[`${field}`].value);
           i++;
-          console.log(field);
         }
       }
     }
+    console.log(this.patientData.activeCategories);
     this.dosService.initiateDosCalculation();
   }
 

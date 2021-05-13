@@ -33,6 +33,7 @@ export class DegreeOfSimilarityService {
         }
       }
     }
+    console.log(this.dosMap);
   }
 
   calculateDOS(scoreA: Map<string, number>, scoreB: Map<string, number>): number {
@@ -40,13 +41,14 @@ export class DegreeOfSimilarityService {
     let dos = 0;
     let numberOfScores = 0;
     for (const key of keys) {
-      const valueA = scoreA.get(key) as number;
-      const valueB = scoreB.get(key) as number;
-      if (!isNaN(valueA) && !isNaN(valueB)) {
-        dos += Math.abs(valueA - valueB) / 100;
-        numberOfScores++;
+      if (this.patientData.activeCategories.get(key)) {
+        const valueA = scoreA.get(key) as number;
+        const valueB = scoreB.get(key) as number;
+        if (!isNaN(valueA) && !isNaN(valueB)) {
+          dos += Math.abs(valueA - valueB) / 100;
+          numberOfScores++;
+        }
       }
-
     }
     return 1 - (dos / numberOfScores);
   }

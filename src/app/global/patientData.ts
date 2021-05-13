@@ -7,7 +7,8 @@ import {GlobalConstants} from './globalConstants';
 export class PatientData {
   visits: Visit[] = [];
   patients: Patient[] = [];
-  activeCategories: boolean[] = new Array(this.constants.numberOfCategories);
+  // activeCategories: boolean[] = new Array(this.constants.numberOfCategories);
+  activeCategories: Map<string, boolean> = new Map<string, boolean>();
 
   constructor(private constants: GlobalConstants) {
   }
