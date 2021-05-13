@@ -3,7 +3,6 @@ import {FormBuilder, FormGroup, Validators} from '@angular/forms';
 import {Visit} from '../../objects/visit';
 import {Score} from '../../objects/score';
 import {Patient} from '../../objects/patient';
-import {Study} from '../../objects/study';
 import {DegreeOfSimilarityService} from '../../services/degree-of-similarity.service';
 import {PatientData} from '../../global/patientData';
 import {GlobalConstants} from '../../global/globalConstants';
@@ -20,7 +19,8 @@ export class SettingsComponent implements OnInit {
 
   constructor(private formBuilder: FormBuilder,
               private dosService: DegreeOfSimilarityService,
-              private patientData: PatientData,) {
+              private patientData: PatientData,
+              private constants: GlobalConstants) {
     this.categoryForm = formBuilder.group({
         sfVitality: [true, Validators.required],
         sfPhysicalFunctioning: [true, Validators.required],
@@ -64,7 +64,7 @@ export class SettingsComponent implements OnInit {
         }
       }
     }
-    this.dosService.calculateDoS();
+    this.dosService.initiateDosCalculation();
   }
 
   /**
@@ -104,7 +104,7 @@ export class SettingsComponent implements OnInit {
     reader.onload = () => {
       const patientData = this.CsvToJSON(reader.result as string);
       this.preparePatientData(patientData);
-      console.log(this.patientData.studies);
+      console.log(this.patientData.visits);
       console.log(this.patientData.patients);
     };
   }
@@ -115,7 +115,6 @@ export class SettingsComponent implements OnInit {
   resetPatientData(): void {
     this.patientData.visits = [];
     this.patientData.patients = [];
-    this.patientData.studies = [];
   }
 
   /**
@@ -158,7 +157,6 @@ export class SettingsComponent implements OnInit {
     }
 
     const newVisit = new Visit(
-      currentEntry.SITEID,
       currentEntry.SUBJID,
       currentEntry.VISITNUM,
       currentEntry.VISIT,
@@ -168,55 +166,25 @@ export class SettingsComponent implements OnInit {
     this.patientData.visits.push(newVisit);
 
     /**
-     * associated study object is created or extracted from studies array.
-     * visit object is saved in it.
-     */
-    let associatedStudy: Study;
-
-    if (this.patientData.studies.some(s => s.patientId === +currentEntry.SITEID
-      && s.patientStudyId === +currentEntry.SUBJID)) {
-
-      associatedStudy = this.patientData.studies.find(s => s.patientId === +currentEntry.SITEID
-        && s.patientStudyId === +currentEntry.SUBJID) as Study;
-      associatedStudy.visits.push(newVisit);
-
-    } else {
-
-      associatedStudy = new Study(
-        +currentEntry.USUBJID,
-        +currentEntry.SITEID,
-        +currentEntry.SUBJID,
-        currentEntry.COMPLETE === '1',
-        currentEntry.SEYE,
-        currentEntry.TRTAC,
-        [newVisit]
-      );
-
-      this.patientData.studies.push(associatedStudy);
-    }
-
-    /**
      * associated patient object is created or extracted from patient array.
      * associated study object is saved in it.
      */
     let associatedPatient: Patient;
 
-    if (this.patientData.patients.some(p => p.patientId === +currentEntry.SITEID)) {
-
-      associatedPatient = this.patientData.patients.find(p => p.patientId === +currentEntry.SITEID) as Patient;
+    if (this.patientData.patients.some(p => p.patientId === +currentEntry.USUBJID)) {
+      associatedPatient = this.patientData.patients.find(p => p.patientId === +currentEntry.USUBJID) as Patient;
 
       /**
-       * only save study in patient if it has not been already saved
+       * only save visit in patient if it has not been already saved
        */
-      if (!associatedPatient.studies.some(s => s.patientStudyId === +currentEntry.SUBJID
-        && s.patientId === +currentEntry.SITEID)) {
-        associatedPatient.studies.push(associatedStudy);
+      if (!associatedPatient.visits.some(v => v.patientVisitId === +currentEntry.VISITNUM
+        && v.patientId === +currentEntry.USUBJID)) {
+        associatedPatient.visits.push(newVisit);
       }
 
     } else {
       associatedPatient = new Patient(
-        +currentEntry.SITEID,
-        currentEntry.INVNAM,
+        +currentEntry.USUBJID,
         currentEntry.COUNTRY,
         currentEntry.REGION,
         currentEntry.BRTHDTC,
@@ -224,7 +192,10 @@ export class SettingsComponent implements OnInit {
         currentEntry.SEX,
         currentEntry.RACE,
         currentEntry.ETHNIC,
-        [associatedStudy]
+        currentEntry.COMPLETE === '1',
+        currentEntry.SEYE,
+        currentEntry.TRTAC,
+        [newVisit]
       );
       this.patientData.patients.push(associatedPatient);
     }

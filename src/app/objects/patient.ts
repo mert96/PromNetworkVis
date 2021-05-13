@@ -1,9 +1,9 @@
-import {Study} from './study';
+
+import {Visit} from './visit';
 
 export class Patient {
   constructor(
     public patientId: number,
-    public name: string,
     public country: string,
     public region: string,
     public birthday: string,
@@ -11,16 +11,10 @@ export class Patient {
     public sex: string,
     public race: string,
     public ethnic: string,
-    public studies: Study[]
+    public completed: boolean,
+    public testedEye: string,
+    public treatment: string,
+    public visits: Visit[]
   ) {
-  }
-
-  getCompletedStudy(): Study | null {
-    for (const study of this.studies) {
-      if (study.completedStudy) {
-        return study;
-      }
-    }
-    return null;
   }
 }

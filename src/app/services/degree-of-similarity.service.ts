@@ -7,41 +7,51 @@ import {GlobalConstants} from '../global/globalConstants';
 })
 export class DegreeOfSimilarityService {
 
-  dosTable: number[][][] = [];
+  dosMap: Map<string, number> = new Map<string, number>();
 
   constructor(private patientData: PatientData,
               private constants: GlobalConstants) {
   }
 
   // Pre-calculate all DoS before generating graphs
-  calculateDoS(): void {
-    const studies = this.patientData.studies;
-    for (let k = 0; k < this.constants.maxNumOfVisits; k++) { // for every visit,
-      for (let i = 0; i < studies.length; i++) {              // of every study,
-        this.dosTable[i] = [];
-        for (let j = i + 1; j < studies.length; j++) {        // compare to others.
-          this.dosTable[i][j] = [];
-          const studyAVisit = studies[i].visits[0].scores.mapOfScores;
-          const studyBVisit = studies[k].visits[0].scores.mapOfScores;
-          if (studyAVisit !== undefined && studyBVisit !== undefined && studies[i].completedStudy && studies[k].completedStudy) {
-            const keys = studyAVisit.keys();
-            let dos = 0;
-            let numberOfScores = 0;
-            for (const key of keys) {
-              if (!isNaN(studyAVisit.get(key)) && !isNaN(studyBVisit.get(key))) {
-                dos += Math.abs(studyAVisit.get(key) - studyBVisit.get(key)) / 100;
-                numberOfScores++;
-              }
+  initiateDosCalculation(): void {
+    const patients = this.patientData.patients;
+    for (let k = 0; k < this.constants.maxNumOfVisits; k++) {  // for every visit,
+      for (let i = 0; i < patients.length; i++) {              // of every patient,
+        for (let j = i + 1; j < patients.length; j++) {        // compare to other patients.
+          if (k < patients[i].visits.length && k < patients[j].visits.length) {
+            const patientAVisit = patients[i].visits[k].scores.mapOfScores;
+            const patientBVisit = patients[j].visits[k].scores.mapOfScores;
+            if (patientAVisit !== undefined && patientBVisit !== undefined && patients[i].completed && patients[k].completed) {
+              this.dosMap.set(`${patients[i].patientId}` + ':' + `${patients[j].patientId}` + ':' + `${k + 1}`,
+                this.calculateDOS(patientAVisit, patientBVisit));
             }
-            this.dosTable[i][j][k] = 100 - dos;
-            // console.log(studies[i].patientId + '.' + studies[i].patientStudyId +
-            //  ' <-> ' + studies[j].patientId + '.' + studies[j].patientStudyId + ': ', 100 - dos);
-          }
-          else {
-            this.dosTable[i][j][k] = -1;
+            else {
+              this.dosMap.set(`${patients[i].patientId}` + ':' + `${patients[j].patientId}` + ':' + `${k + 1}`, -1);
+            }
           }
         }
       }
     }
+  }
+
+  calculateDOS(scoreA: Map<string, number>, scoreB: Map<string, number>): number {
+    const keys = scoreA.keys();
+    let dos = 0;
+    let numberOfScores = 0;
+    for (const key of keys) {
+      const valueA = scoreA.get(key) as number;
+      const valueB = scoreB.get(key) as number;
+      if (!isNaN(valueA) && !isNaN(valueB)) {
+        dos += Math.abs(valueA - valueB) / 100;
+        numberOfScores++;
+      }
+
+    }
+    return 1 - (dos / numberOfScores);
+  }
+
+  getDoS(): Map<string, number> {
+    return this.dosMap;
   }
 }
