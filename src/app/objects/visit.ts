@@ -1,4 +1,4 @@
-import {Scores} from './Scores';
+import {Score} from './score';
 
 export class Visit {
   constructor(
@@ -6,7 +6,7 @@ export class Visit {
     public patientStudyId: number,
     public studyVisitId: number,
     public visit: string,
-    public scores: Scores
+    public scores: Score
   ) {
   }
 }

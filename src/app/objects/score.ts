@@ -1,4 +1,4 @@
-export class Scores {
+export class Score {
   constructor(
     public mapOfScores = new Map()
   ){}
@@ -9,7 +9,7 @@ export class Scores {
 
 }
 /*
-public QSBC: number,
+  public QSBCS: number,
   public QSBGH: number,
   public QSBGV: number,
   public QSOP: number,

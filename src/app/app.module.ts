@@ -5,6 +5,8 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { SettingsComponent } from './components/settings/settings.component';
 import { ReactiveFormsModule } from '@angular/forms';
+import {PatientData} from './global/patientData';
+import {GlobalConstants} from './global/globalConstants';
 
 @NgModule({
   declarations: [
@@ -16,7 +18,7 @@ import { ReactiveFormsModule } from '@angular/forms';
     AppRoutingModule,
     ReactiveFormsModule
   ],
-  providers: [],
+  providers: [PatientData, GlobalConstants],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

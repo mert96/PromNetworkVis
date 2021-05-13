@@ -1,9 +1,13 @@
 import {Component, OnInit} from '@angular/core';
 import {FormBuilder, FormGroup, Validators} from '@angular/forms';
-import {Visit} from '../../objects/Visit';
-import {Scores} from '../../objects/Scores';
-import {Patient} from '../../objects/Patient';
-import {Study} from '../../objects/Study';
+import {Visit} from '../../objects/visit';
+import {Score} from '../../objects/score';
+import {Patient} from '../../objects/patient';
+import {Study} from '../../objects/study';
+import {DegreeOfSimilarityService} from '../../services/degree-of-similarity.service';
+import {PatientData} from '../../global/patientData';
+import {GlobalConstants} from '../../global/globalConstants';
+
 
 @Component({
   selector: 'app-settings',
@@ -11,14 +15,12 @@ import {Study} from '../../objects/Study';
   styleUrls: ['./settings.component.scss']
 })
 export class SettingsComponent implements OnInit {
-  private numberOfCategories = 20;
-  categoryForm: FormGroup;
-  activeCategories: boolean[] = new Array(this.numberOfCategories);
-  visits: Visit[] = [];
-  patients: Patient[] = [];
-  studies: Study[] = [];
 
-  constructor(private formBuilder: FormBuilder) {
+  categoryForm: FormGroup;
+
+  constructor(private formBuilder: FormBuilder,
+              private dosService: DegreeOfSimilarityService,
+              private patientData: PatientData,) {
     this.categoryForm = formBuilder.group({
         sfVitality: [true, Validators.required],
         sfPhysicalFunctioning: [true, Validators.required],
@@ -56,12 +58,13 @@ export class SettingsComponent implements OnInit {
       let i = 0;
       for (const field in this.categoryForm.controls) {
         if (this.categoryForm.controls.hasOwnProperty(field)) {
-          this.activeCategories[i] = this.categoryForm.controls[`${field}`].value;
+          this.patientData.activeCategories[i] = this.categoryForm.controls[`${field}`].value;
           i++;
+          console.log(field);
         }
       }
-      // start calculation of DoS if a csv file was read.
     }
+    this.dosService.calculateDoS();
   }
 
   /**
@@ -101,8 +104,8 @@ export class SettingsComponent implements OnInit {
     reader.onload = () => {
       const patientData = this.CsvToJSON(reader.result as string);
       this.preparePatientData(patientData);
-      console.log(this.studies);
-      console.log(this.patients);
+      console.log(this.patientData.studies);
+      console.log(this.patientData.patients);
     };
   }
 
@@ -110,9 +113,9 @@ export class SettingsComponent implements OnInit {
    * resets previous patient data to make space for data from new csv file
    */
   resetPatientData(): void {
-    this.visits = [];
-    this.patients = [];
-    this.studies = [];
+    this.patientData.visits = [];
+    this.patientData.patients = [];
+    this.patientData.studies = [];
   }
 
   /**
@@ -144,14 +147,14 @@ export class SettingsComponent implements OnInit {
    */
   createVisit(currentEntry: any, keys: string[]): void {
 
-    const scores: Scores = new Scores();
+    const scores: Score = new Score();
 
     /**
      * 46 <= i < 96 because those number correspond to the column numbers of
      * the relevant scores
      */
     for (let i = 46; i < 91; i++) {
-      scores.pushScore(keys[i], currentEntry[keys[i]]);
+      scores.pushScore(keys[i], +currentEntry[keys[i]]);
     }
 
     const newVisit = new Visit(
@@ -162,16 +165,18 @@ export class SettingsComponent implements OnInit {
       scores
     );
 
+    this.patientData.visits.push(newVisit);
+
     /**
      * associated study object is created or extracted from studies array.
      * visit object is saved in it.
      */
     let associatedStudy: Study;
 
-    if (this.studies.some(s => s.patientId === +currentEntry.SITEID
+    if (this.patientData.studies.some(s => s.patientId === +currentEntry.SITEID
       && s.patientStudyId === +currentEntry.SUBJID)) {
 
-      associatedStudy = this.studies.find(s => s.patientId === +currentEntry.SITEID
+      associatedStudy = this.patientData.studies.find(s => s.patientId === +currentEntry.SITEID
         && s.patientStudyId === +currentEntry.SUBJID) as Study;
       associatedStudy.visits.push(newVisit);
 
@@ -187,7 +192,7 @@ export class SettingsComponent implements OnInit {
         [newVisit]
       );
 
-      this.studies.push(associatedStudy);
+      this.patientData.studies.push(associatedStudy);
     }
 
     /**
@@ -196,9 +201,9 @@ export class SettingsComponent implements OnInit {
      */
     let associatedPatient: Patient;
 
-    if (this.patients.some(p => p.patientId === +currentEntry.SITEID)) {
+    if (this.patientData.patients.some(p => p.patientId === +currentEntry.SITEID)) {
 
-      associatedPatient = this.patients.find(p => p.patientId === +currentEntry.SITEID) as Patient;
+      associatedPatient = this.patientData.patients.find(p => p.patientId === +currentEntry.SITEID) as Patient;
 
       /**
        * only save study in patient if it has not been already saved
@@ -221,7 +226,7 @@ export class SettingsComponent implements OnInit {
         currentEntry.ETHNIC,
         [associatedStudy]
       );
-      this.patients.push(associatedPatient);
+      this.patientData.patients.push(associatedPatient);
     }
   }
 }

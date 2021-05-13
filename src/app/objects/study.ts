@@ -1,4 +1,4 @@
-import {Visit} from './Visit';
+import {Visit} from './visit';
 
 export class Study {
   constructor(

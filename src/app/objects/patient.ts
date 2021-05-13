@@ -1,6 +1,6 @@
-import {Study} from './Study';
+import {Study} from './study';
 
-export class Patient{
+export class Patient {
   constructor(
     public patientId: number,
     public name: string,
@@ -12,5 +12,15 @@ export class Patient{
     public race: string,
     public ethnic: string,
     public studies: Study[]
-  ){}
+  ) {
+  }
+
+  getCompletedStudy(): Study | null {
+    for (const study of this.studies) {
+      if (study.completedStudy) {
+        return study;
+      }
+    }
+    return null;
+  }
 }
