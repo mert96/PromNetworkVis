@@ -1,5 +1,5 @@
 import {Component, OnInit} from '@angular/core';
-import {FormBuilder, FormGroup, Validators} from '@angular/forms';
+import {FormBuilder, FormGroup, Validators, FormsModule} from '@angular/forms';
 import {Visit} from '../../objects/visit';
 import {Score} from '../../objects/score';
 import {Patient} from '../../objects/patient';
@@ -15,76 +15,73 @@ import {GlobalConstants} from '../../global/globalConstants';
 })
 export class SettingsComponent implements OnInit {
 
-  categoryForm: FormGroup;
-
   constructor(private formBuilder: FormBuilder,
               private dosService: DegreeOfSimilarityService,
-              private patientData: PatientData,
+              public patientData: PatientData,
               private constants: GlobalConstants) {
-    this.categoryForm = formBuilder.group({
-        QSVT: [true, Validators.required],  // SF36
-        QSPF: [true, Validators.required],
-        QSBP: [true, Validators.required],
-        QSGP: [true, Validators.required],
-        QSRP: [true, Validators.required],
-        QSSO: [true, Validators.required],
-        QSRE: [true, Validators.required],
-        QSME: [true, Validators.required],
-        QSBGH: [true, Validators.required], // VFQ25
-        QSBGV: [true, Validators.required],
-        QSOP: [true, Validators.required],
-        QSNA: [true, Validators.required],
-        QSDA: [true, Validators.required],
-        QSSF: [true, Validators.required],
-        QSMH: [true, Validators.required],
-        QSRD: [true, Validators.required],
-        QSDP: [true, Validators.required],
-        QSDV: [true, Validators.required],
-        QSCV: [true, Validators.required],
-        QSPV: [true, Validators.required]
-      /*
-      sfVitality: [true, Validators.required],
-      sfPhysicalFunctioning: [true, Validators.required],
-      sfBodilyPain: [true, Validators.required],
-      sfGeneralHealthPerceptions: [true, Validators.required],
-      sfPhysicalRoleFunctioning: [true, Validators.required],
-      sfSocialRoleFunctioning: [true, Validators.required],
-      sfEmotionalRoleFunctioning: [true, Validators.required],
-      sfMentalHealth: [true, Validators.required],
-      vfqGeneralHealth: [true, Validators.required],
-      vfqGeneralVision: [true, Validators.required],
-      vfqOcularPain: [true, Validators.required],
-      vfqNearActivities: [true, Validators.required],
-      vfqDistanceActivities: [true, Validators.required],
-      vfqSocialFunctioning: [true, Validators.required],
-      vfqMentalHealth: [true, Validators.required],
-      vfqRoleDifficulties: [true, Validators.required],
-      vfqDependency: [true, Validators.required],
-      vfqDriving: [true, Validators.required],
-      vfqColorVision: [true, Validators.required],
-      vfqPeripheralVision: [true, Validators.required]
-      */
-      }
-    );
+    /*
+    sfVitality: [true, Validators.required],
+    sfPhysicalFunctioning: [true, Validators.required],
+    sfBodilyPain: [true, Validators.required],
+    sfGeneralHealthPerceptions: [true, Validators.required],
+    sfPhysicalRoleFunctioning: [true, Validators.required],
+    sfSocialRoleFunctioning: [true, Validators.required],
+    sfEmotionalRoleFunctioning: [true, Validators.required],
+    sfMentalHealth: [true, Validators.required],
+    vfqGeneralHealth: [true, Validators.required],
+    vfqGeneralVision: [true, Validators.required],
+    vfqOcularPain: [true, Validators.required],
+    vfqNearActivities: [true, Validators.required],
+    vfqDistanceActivities: [true, Validators.required],
+    vfqSocialFunctioning: [true, Validators.required],
+    vfqMentalHealth: [true, Validators.required],
+    vfqRoleDifficulties: [true, Validators.required],
+    vfqDependency: [true, Validators.required],
+    vfqDriving: [true, Validators.required],
+    vfqColorVision: [true, Validators.required],
+    vfqPeripheralVision: [true, Validators.required]
+    */
   }
 
   ngOnInit(): void {
     this.refreshCategories();
   }
 
+  toggleAll(prefix: string): void {
+    const sfCategories = ['QSVT', 'QSPF', 'QSBP', 'QSGP', 'QSRP', 'QSSO', 'QSRE', 'QSME'];
+    const vfqCategories = ['QSBGH', 'QSBGV', 'QSOP', 'QSNA', 'QSDA', 'QSSF', 'QSMH'
+      , 'QSRD', 'QSDP', 'QSDV', 'QSCV', 'QSPV'];
+
+    let categories: string[] = [];
+    if (prefix === 'sf') {
+      categories = sfCategories;
+    } else if (prefix === 'vfq') {
+      categories = vfqCategories;
+    } else {
+      return;
+    }
+
+    let numberOfActiveCategories = 0;
+
+    for (const category of categories) {
+      if (this.patientData.activeCategories.get(category)) {
+        numberOfActiveCategories++;
+      }
+    }
+
+    for (const category of categories) {
+      if (numberOfActiveCategories === vfqCategories.length) {
+        this.patientData.activeCategories.set(category, false);
+      } else {
+        this.patientData.activeCategories.set(category, true);
+      }
+    }
+  }
+
   /**
    * updates which categories are chosen by the user and stores it in an array (activeCategories)
    */
   refreshCategories(): void {
-    if (this.categoryForm.valid) {
-      let i = 0;
-      for (const field in this.categoryForm.controls) {
-        if (this.categoryForm.controls.hasOwnProperty(field)) {
-          this.patientData.activeCategories.set(field, this.categoryForm.controls[`${field}`].value);
-          i++;
-        }
-      }
-    }
     console.log(this.patientData.activeCategories);
     this.dosService.initiateDosCalculation();
   }

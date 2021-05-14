@@ -4,7 +4,7 @@ import { BrowserModule } from '@angular/platform-browser';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { SettingsComponent } from './components/settings/settings.component';
-import { ReactiveFormsModule } from '@angular/forms';
+import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {PatientData} from './global/patientData';
 import {GlobalConstants} from './global/globalConstants';
 
@@ -16,7 +16,8 @@ import {GlobalConstants} from './global/globalConstants';
   imports: [
     BrowserModule,
     AppRoutingModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    FormsModule
   ],
   providers: [PatientData, GlobalConstants],
   bootstrap: [AppComponent]
