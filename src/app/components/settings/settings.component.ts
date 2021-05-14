@@ -70,7 +70,7 @@ export class SettingsComponent implements OnInit {
     }
 
     for (const category of categories) {
-      if (numberOfActiveCategories === vfqCategories.length) {
+      if (numberOfActiveCategories === categories.length) {
         this.patientData.activeCategories.set(category, false);
       } else {
         this.patientData.activeCategories.set(category, true);
