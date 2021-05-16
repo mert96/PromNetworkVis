@@ -23,11 +23,11 @@ export class DegreeOfSimilarityService {
             const patientAVisit = patients[i].visits[k].scores.mapOfScores;
             const patientBVisit = patients[j].visits[k].scores.mapOfScores;
             if (patientAVisit !== undefined && patientBVisit !== undefined && patients[i].completed && patients[k].completed) {
-              this.dosMap.set(`${patients[i].patientId}` + ':' + `${patients[j].patientId}` + ':' + `${k + 1}`,
+              this.dosMap.set('A' + `${patients[i].patientId}` + ':B' + `${patients[j].patientId}` + ':V' + `${k + 1}`,
                 this.calculateDOS(patientAVisit, patientBVisit));
             }
             else {
-              this.dosMap.set(`${patients[i].patientId}` + ':' + `${patients[j].patientId}` + ':' + `${k + 1}`, -1);
+              this.dosMap.set('A' + `${patients[i].patientId}` + ':B' + `${patients[j].patientId}` + ':V' + `${k + 1}`, -1);
             }
           }
         }
@@ -50,7 +50,8 @@ export class DegreeOfSimilarityService {
         }
       }
     }
-    return 1 - (dos / numberOfScores);
+
+    return numberOfScores === 0 ? -1 : 1 - (dos / numberOfScores);
   }
 
   getDoS(): Map<string, number> {

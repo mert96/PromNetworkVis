@@ -45,6 +45,8 @@ export class SettingsComponent implements OnInit {
 
   ngOnInit(): void {
     this.refreshCategories();
+    console.log(+'43,456.00');
+    console.log(typeof +'43,456.00');
   }
 
   toggleAll(prefix: string): void {
