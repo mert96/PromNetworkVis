@@ -7,11 +7,13 @@ import { SettingsComponent } from './components/settings/settings.component';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {PatientData} from './global/patientData';
 import {GlobalConstants} from './global/globalConstants';
+import { ClusterGraphComponent } from './components/cluster-graph/cluster-graph.component';
 
 @NgModule({
   declarations: [
     AppComponent,
-    SettingsComponent
+    SettingsComponent,
+    ClusterGraphComponent
   ],
   imports: [
     BrowserModule,

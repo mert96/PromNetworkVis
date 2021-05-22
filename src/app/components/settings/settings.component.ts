@@ -6,6 +6,9 @@ import {Patient} from '../../objects/patient';
 import {DegreeOfSimilarityService} from '../../services/degree-of-similarity.service';
 import {PatientData} from '../../global/patientData';
 import {GlobalConstants} from '../../global/globalConstants';
+import {ClusterServiceService} from '../../services/cluster-service.service';
+import * as math from 'mathjs';
+import {Matrix} from 'mathjs';
 
 
 @Component({
@@ -18,7 +21,8 @@ export class SettingsComponent implements OnInit {
   constructor(private formBuilder: FormBuilder,
               private dosService: DegreeOfSimilarityService,
               public patientData: PatientData,
-              private constants: GlobalConstants) {
+              private constants: GlobalConstants,
+              private clusterService: ClusterServiceService) {
     /*
     sfVitality: [true, Validators.required],
     sfPhysicalFunctioning: [true, Validators.required],
@@ -43,10 +47,19 @@ export class SettingsComponent implements OnInit {
     */
   }
 
-  ngOnInit(): void {
-    this.refreshCategories();
-    console.log(+'43,456.00');
-    console.log(typeof +'43,456.00');
+  ngOnInit(): void {}
+
+  /**
+   * @return true if no category is selected, false if at least 1 category is selected
+   */
+  noCatSelected(): boolean {
+    let noCategorySelected = true;
+    this.patientData.activeCategories.forEach((value: boolean) => {
+      if (value) {
+        noCategorySelected = false;
+      }
+    });
+    return noCategorySelected;
   }
 
   toggleAll(prefix: string): void {
@@ -86,6 +99,7 @@ export class SettingsComponent implements OnInit {
   refreshCategories(): void {
     console.log(this.patientData.activeCategories);
     this.dosService.initiateDosCalculation();
+    this.clusterService.initializeClustering();
   }
 
   /**
@@ -125,7 +139,7 @@ export class SettingsComponent implements OnInit {
     reader.onload = () => {
       const patientData = this.CsvToJSON(reader.result as string);
       this.preparePatientData(patientData);
-      console.log(this.patientData.visits);
+      // console.log(this.patientData.visits);
       console.log(this.patientData.patients);
     };
   }
@@ -136,6 +150,7 @@ export class SettingsComponent implements OnInit {
   resetPatientData(): void {
     this.patientData.visits = [];
     this.patientData.patients = [];
+    this.dosService.resetDoS();
   }
 
   /**
@@ -178,7 +193,7 @@ export class SettingsComponent implements OnInit {
     }
 
     const newVisit = new Visit(
-      currentEntry.SUBJID,
+      currentEntry.USUBJID,
       currentEntry.VISITNUM,
       currentEntry.VISIT,
       scores

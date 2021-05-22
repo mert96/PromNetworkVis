@@ -8,25 +8,25 @@ export class PatientData {
   patients: Patient[] = [];
   // activeCategories: boolean[] = new Array(this.constants.numberOfCategories);
   activeCategories: Map<string, boolean> = new Map<string, boolean>([
-    ['QSVT', false], // SF36
-    ['QSPF', false],
-    ['QSBP', false],
-    ['QSGP', false],
-    ['QSRP', false],
-    ['QSSO', false],
-    ['QSRE', false],
-    ['QSME', false],
-    ['QSBGH', false], // VFQ25
-    ['QSBGV', false],
-    ['QSOP', false],
-    ['QSNA', false],
-    ['QSDA', false],
-    ['QSSF', false],
-    ['QSMH', false],
-    ['QSRD', false],
-    ['QSDP', false],
-    ['QSDV', false],
-    ['QSCV', false],
-    ['QSPV', false]
+    ['QSVT', true], // SF36
+    ['QSPF', true],
+    ['QSBP', true],
+    ['QSGP', true],
+    ['QSRP', true],
+    ['QSSO', true],
+    ['QSRE', true],
+    ['QSME', true],
+    ['QSBGH', true], // VFQ25
+    ['QSBGV', true],
+    ['QSOP', true],
+    ['QSNA', true],
+    ['QSDA', true],
+    ['QSSF', true],
+    ['QSMH', true],
+    ['QSRD', true],
+    ['QSDP', true],
+    ['QSDV', true],
+    ['QSCV', true],
+    ['QSPV', true]
   ]);
 }
