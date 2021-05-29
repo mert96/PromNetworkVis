@@ -10,7 +10,7 @@ import {Matrix} from 'mathjs';
 export class ClusterServiceService {
 
   expandFactor = 2;
-  inflateFactor = 2;
+  inflateFactor = 3;
   maxLoops = 10;
 
   clusterMap: Map<number, number[][]> = new Map<number, number[][]>();
