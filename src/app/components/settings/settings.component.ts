@@ -100,6 +100,14 @@ export class SettingsComponent implements OnInit {
     console.log(this.patientData.activeCategories);
     this.dosService.initiateDosCalculation();
     this.clusterService.initializeClustering();
+    let countCompleted = 0;
+    this.patientData.patients.forEach(value => {
+      if (value.completed){
+        countCompleted++;
+      }
+    });
+    console.log('completed studies: ', countCompleted);
+
   }
 
   /**
@@ -151,6 +159,7 @@ export class SettingsComponent implements OnInit {
     this.patientData.visits = [];
     this.patientData.patients = [];
     this.dosService.resetDoS();
+    this.clusterService.visits = [];
   }
 
   /**

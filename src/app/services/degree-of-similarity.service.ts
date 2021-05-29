@@ -2,11 +2,16 @@ import {Injectable} from '@angular/core';
 import {PatientData} from '../global/patientData';
 import {GlobalConstants} from '../global/globalConstants';
 import * as math from 'mathjs';
+import * as d3 from 'd3';
 
 @Injectable({
   providedIn: 'root'
 })
 export class DegreeOfSimilarityService {
+
+  // TODO make differencesin DoS higher through a exponential function f.e. e^(10x). Higher differences in DoS should to
+  // TODO more clusters and more informative clusters. The function has a range of 1 to 22026
+  // TODO Key points: 0,75 = 1808; 0.85 = 4914; 0.95 = 13359
 
   private dosMap: Map<string, number> = new Map<string, number>();
 
@@ -21,6 +26,8 @@ export class DegreeOfSimilarityService {
    * (no score for selected category, discontinued study etc.) have 0 assigned as the DoS value
    */
   initiateDosCalculation(): void {
+
+
     const patients = this.patientData.patients;
     for (let k = 0; k < this.constants.maxNumOfVisits; k++) {  // for every visit,
       for (let i = 0; i < patients.length; i++) {              // of every patient,
@@ -41,6 +48,7 @@ export class DegreeOfSimilarityService {
       }
     }
     console.log(this.dosMap);
+
   }
 
   /*
@@ -69,6 +77,7 @@ export class DegreeOfSimilarityService {
         }
       }
     }
+
     return numberOfScores === 0 ? 0 : math.round(1 - (dos / numberOfScores), this.constants.numberOfDecimalPlaces);
   }
 
