@@ -1,5 +1,8 @@
 import {Component, OnInit} from '@angular/core';
 import * as d3 from 'd3';
+import {ClusterServiceService} from '../../services/cluster-service.service';
+import {PatientData} from '../../global/patientData';
+import {HierarchyCircularLink} from 'd3';
 
 @Component({
   selector: 'app-cluster-graph',
@@ -8,49 +11,64 @@ import * as d3 from 'd3';
 })
 export class ClusterGraphComponent implements OnInit {
 
-  range = 0;
-
-  constructor() {
+  constructor(private clusterService: ClusterServiceService,
+              private patientData: PatientData) {
   }
 
   ngOnInit(): void {
-
-
+    this.clusterService.loadedData.subscribe((isLoaded: boolean) => {
+      if (isLoaded) {
+        console.log('loaded');
+        this.initializeVisualization();
+      }
+    });
   }
 
-  /**
-   ignore function, just for testing and getting used to d3js
-   */
-  logRange(value: number): void {
-    this.range = value;
+  initializeVisualization(): void {
 
-    const data = [0, 1, 2, 3, 4];
+    d3.selectAll('g').remove();
 
-    const xScale = d3.scaleLinear()
-      .domain([0, 150])
-      .range([20, 700]);
+    const clusterMap: Map<number, number[][]> = this.clusterService.getClusters();
+    const clusterVisit1 = clusterMap.get(0) as number[][];
 
-    const yScale = d3.scaleLinear()
-      .domain([0, 150])
-      .range([20, 300]);
+    const width = 750;
+    const height = 300;
 
-    const colorScale = d3.scaleLinear<string>()
-      .domain([0, 150])
-      .range(['aqua', 'blue']);
+    const pack = d3.pack()
+      .size([width, height])
+      .padding(3);
 
+    const packedData = pack(d3.hierarchy({children: clusterVisit1})
+      .sum(d => Array.isArray(d) ? d.length : 0));
 
-    d3.select('rect').remove();
-    d3.select('#cluster')
-      .append('rect')
-      .attr('width', 100)
-      .attr('height', 100)
-      // Set the x value based on the slider value (passed into the x scale)
-      .attr('x', xScale(this.range))
-      // Same for y/y ccale!
-      .attr('y', yScale(this.range))
-      // Same for color/color scale!
-      .style('fill', colorScale(this.range));
+    console.log(packedData);
+    console.log(packedData.leaves());
+
+    const leaf = d3.select('#cluster')
+      .selectAll('g')
+      .data(packedData.leaves())
+      .join('g')
+      .attr('transform', d => `translate(${d.x + 1},${d.y + 1})`);
+
+    leaf.append('circle')
+      .attr('r', d => d.r)
+      .attr('fill', d => '#ff3e19');
+
+    leaf.append('text')
+      .selectAll('tspan')
+      .data((d) => {
+        const clusterMembers = [];
+        for (const v of d.data as number[]) {
+          clusterMembers.push(v);
+        }
+        console.log(clusterMembers);
+        return clusterMembers;
+      })
+      .join('tspan')
+      .style('font-size', '9px')
+      .attr('x', 0)
+      .attr('y', (d, i, nodes) => `${i - nodes.length / 2 + 0.8}em`)
+      .text(d => d);
   }
-
 
 }

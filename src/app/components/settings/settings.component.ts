@@ -9,6 +9,7 @@ import {GlobalConstants} from '../../global/globalConstants';
 import {ClusterServiceService} from '../../services/cluster-service.service';
 import * as math from 'mathjs';
 import {Matrix} from 'mathjs';
+import {ClusterGraphComponent} from '../cluster-graph/cluster-graph.component';
 
 
 @Component({
@@ -160,6 +161,7 @@ export class SettingsComponent implements OnInit {
     this.patientData.patients = [];
     this.dosService.resetDoS();
     this.clusterService.visits = [];
+    this.clusterService.setLoadedData(false);
   }
 
   /**

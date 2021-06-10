@@ -3,6 +3,7 @@ import {DegreeOfSimilarityService} from './degree-of-similarity.service';
 import {GlobalConstants} from '../global/globalConstants';
 import * as math from 'mathjs';
 import {Matrix} from 'mathjs';
+import {BehaviorSubject} from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -13,11 +14,20 @@ export class ClusterServiceService {
   inflateFactor = 3;
   maxLoops = 10;
 
+  loadedData: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
   clusterMap: Map<number, number[][]> = new Map<number, number[][]>();
   visits: Matrix[] = [];
 
   constructor(private dos: DegreeOfSimilarityService,
               private constants: GlobalConstants) {
+  }
+
+  setLoadedData(b: boolean): void {
+    this.loadedData.next(b);
+  }
+
+  getClusters(): Map<number, number[][]> {
+    return this.clusterMap;
   }
 
 
@@ -32,18 +42,20 @@ export class ClusterServiceService {
       this.convertMapToMatrix(i);
       this.startMarkovClustering(i);
     }
+
+    this.setLoadedData(true);
     /*
 
     for (let i = 0; i < 1; i++) {
       // this.convertMapToMatrix(i);
       this.visits.push(math.matrix([
-        [0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
         [1, 0, 1, 0, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
         [0, 1, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
         [0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
         [0, 1, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
         [0, 1, 1, 0, 1, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [1, 0, 0, 1, 0, 0, 0, 1, 1, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [1, 0, 0, 1, 0, 0, 0, 1, 1, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
         [0, 0, 0, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
         [0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
         [0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
@@ -66,17 +78,15 @@ export class ClusterServiceService {
         [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
         [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
         [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0],
+        [1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0],
       ]));
       this.visits[0] = this.addLoops(this.visits[0]);
       this.visits[0] = this.normalize(this.visits[0]);
       this.startMarkovClustering(i);
     }
     */
-
-    console.log(this.visits);
 
   }
 
@@ -86,16 +96,15 @@ export class ClusterServiceService {
    * adds loops and triggers the initial normalization
    * @param visit: id which corresponds to the visit id
    */
-  convertMapToMatrix(visit: number): void {
+  private convertMapToMatrix(visit: number): void {
     let adjMatrix: Matrix = math.matrix();
     const dosMap = this.dos.getDoS();
     for (const [key, value] of dosMap) {
       if (key.includes('V' + (visit + 1))) {
         const indices = this.dos.getIndices(key);
         // console.log(key, ' -> ' + `${indices}` + ' : ' + value);
-        const scaledValue = value; // this.scale(value);
-        adjMatrix.subset(math.index(indices[0] - 1, indices[1] - 1), scaledValue < 0.90 ? 0 : scaledValue/*< this.scale(0.90) ? 0 : scaledValue*/);
-        adjMatrix.subset(math.index(indices[1] - 1, indices[0] - 1), scaledValue < 0.90 ? 0 : scaledValue/*< this.scale(0.90) ? 0 : scaledValue*/);
+        adjMatrix.subset(math.index(indices[0] - 1, indices[1] - 1), value < 0.90 ? 0 : value);
+        adjMatrix.subset(math.index(indices[1] - 1, indices[0] - 1), value < 0.90 ? 0 : value);
 
       }
     }
@@ -117,18 +126,18 @@ export class ClusterServiceService {
   /**
    *
    */
-  expand(visit: number): void {
+  private expand(visit: number): void {
     this.visits[visit] = math.pow(this.visits[visit], this.expandFactor) as Matrix;
   }
 
   /**
    *
    */
-  inflate(visit: number): void {
+  private inflate(visit: number): void {
     this.visits[visit] = this.normalize(math.dotPow(this.visits[visit], this.inflateFactor) as Matrix);
   }
 
-  finished(E: Matrix, I: Matrix): boolean {
+  private finished(E: Matrix, I: Matrix): boolean {
     let finished = true;
     const D: Matrix = math.subtract(E, I) as Matrix;
     D.forEach((value) => {
@@ -143,7 +152,7 @@ export class ClusterServiceService {
    * the core of the Markov Cluster Algorithm
    * does the inflate/expand loop, with an already looped and normalized matrix
    */
-  startMarkovClustering(visit: number): void {
+  private startMarkovClustering(visit: number): void {
 
     for (let i = 0; i < this.maxLoops; i++) {
       this.expand(visit);
@@ -152,13 +161,13 @@ export class ClusterServiceService {
       const I = math.clone(this.visits[visit]);
       if (this.finished(E, I) || i === this.maxLoops - 1) {
         // console.log(I);
-        this.clusterMap.set(visit, this.getClusters(this.visits[visit]));
+        this.clusterMap.set(visit, this.extractClusters(this.visits[visit]));
         break;
       }
     }
   }
 
-  getClusters(M: Matrix): number [][] {
+  private extractClusters(M: Matrix): number [][] {
     const clusters = [];
 
     for (let i = 0; i < M.size()[0]; i++) {
@@ -178,7 +187,7 @@ export class ClusterServiceService {
     return clusters;
   }
 
-  alreadyIn(clusters: number[][], arr: number[]): boolean {
+  private alreadyIn(clusters: number[][], arr: number[]): boolean {
     let contains = false;
     for (const cluster of clusters) {
       if (cluster.length === arr.length) {
@@ -201,12 +210,12 @@ export class ClusterServiceService {
   }
 
 
-  addLoops(M: Matrix): Matrix {
+  private addLoops(M: Matrix): Matrix {
     const diagonal = math.identity(M.size());
     return math.add(M, diagonal) as Matrix;
   }
 
-  normalize(M: Matrix): Matrix {
+  private normalize(M: Matrix): Matrix {
     const columnSums = math.multiply(math.transpose(M), math.ones(M.size()[0]));
     const columnSumMatrix: Matrix = math.matrix();
     for (let i = 0; i < M.size()[0]; i++) {
