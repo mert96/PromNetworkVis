@@ -4,6 +4,7 @@ import {GlobalConstants} from '../global/globalConstants';
 import * as math from 'mathjs';
 import {Matrix} from 'mathjs';
 import {BehaviorSubject} from 'rxjs';
+import {valueReferenceToExpression} from '@angular/compiler-cli/src/ngtsc/annotations/src/util';
 
 @Injectable({
   providedIn: 'root'
@@ -97,21 +98,20 @@ export class ClusterServiceService {
    * @param visit: id which corresponds to the visit id
    */
   private convertMapToMatrix(visit: number): void {
-    let adjMatrix: Matrix = math.matrix();
+    let adjMatrix: Matrix = math.matrix('sparse');
     const dosMap = this.dos.getDoS();
     for (const [key, value] of dosMap) {
       if (key.includes('V' + (visit + 1))) {
         const indices = this.dos.getIndices(key);
         // console.log(key, ' -> ' + `${indices}` + ' : ' + value);
-        adjMatrix.subset(math.index(indices[0] - 1, indices[1] - 1), value < 0.90 ? 0 : value);
-        adjMatrix.subset(math.index(indices[1] - 1, indices[0] - 1), value < 0.90 ? 0 : value);
-
+        if (value >= 0.90) {
+          adjMatrix.subset(math.index(indices[0] - 1, indices[1] - 1), value);
+          adjMatrix.subset(math.index(indices[1] - 1, indices[0] - 1), value);
+        }
       }
     }
-    // console.log(adjMatrix);
     adjMatrix = this.addLoops(adjMatrix);
     adjMatrix = this.normalize(adjMatrix);
-    // console.log(adjMatrix);
     this.visits.push(adjMatrix);
     // console.log('visits :' + visit + ' ', adjMatrix);
   }
@@ -127,13 +127,15 @@ export class ClusterServiceService {
    *
    */
   private expand(visit: number): void {
-    this.visits[visit] = math.pow(this.visits[visit], this.expandFactor) as Matrix;
+    console.log('expand');
+    this.visits[visit] = math.sparse(math.pow(this.visits[visit], this.expandFactor) as Matrix);
   }
 
   /**
    *
    */
   private inflate(visit: number): void {
+    console.log('inflate');
     this.visits[visit] = this.normalize(math.dotPow(this.visits[visit], this.inflateFactor) as Matrix);
   }
 
@@ -155,12 +157,15 @@ export class ClusterServiceService {
   private startMarkovClustering(visit: number): void {
 
     for (let i = 0; i < this.maxLoops; i++) {
+
       this.expand(visit);
       const E = math.clone(this.visits[visit]);
+
       this.inflate(visit);
       const I = math.clone(this.visits[visit]);
+
       if (this.finished(E, I) || i === this.maxLoops - 1) {
-        // console.log(I);
+        console.log(i);
         this.clusterMap.set(visit, this.extractClusters(this.visits[visit]));
         break;
       }
@@ -183,7 +188,6 @@ export class ClusterServiceService {
         }
       }
     }
-    console.log('CLUSTERS: ', clusters);
     return clusters;
   }
 
@@ -211,15 +215,15 @@ export class ClusterServiceService {
 
 
   private addLoops(M: Matrix): Matrix {
-    const diagonal = math.identity(M.size());
+    const diagonal = math.identity(M.size(), 'sparse');
     return math.add(M, diagonal) as Matrix;
   }
 
   private normalize(M: Matrix): Matrix {
     const columnSums = math.multiply(math.transpose(M), math.ones(M.size()[0]));
-    const columnSumMatrix: Matrix = math.matrix();
+    const columnSumMatrix: Matrix = math.matrix('sparse');
     for (let i = 0; i < M.size()[0]; i++) {
-      columnSumMatrix.subset(math.index(i, math.range(0, M.size()[0])), columnSums);
+      columnSumMatrix.subset(math.index(i, math.range(0, M.size()[0])), math.transpose(columnSums));
     }
     return math.dotDivide(M, columnSumMatrix) as Matrix;
   }

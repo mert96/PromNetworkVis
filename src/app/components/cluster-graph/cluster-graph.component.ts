@@ -2,7 +2,8 @@ import {Component, OnInit} from '@angular/core';
 import * as d3 from 'd3';
 import {ClusterServiceService} from '../../services/cluster-service.service';
 import {PatientData} from '../../global/patientData';
-import {HierarchyCircularLink} from 'd3';
+import * as math from 'mathjs';
+import {GlobalConstants} from '../../global/globalConstants';
 
 @Component({
   selector: 'app-cluster-graph',
@@ -11,17 +12,36 @@ import {HierarchyCircularLink} from 'd3';
 })
 export class ClusterGraphComponent implements OnInit {
 
+  dataAvailable = false;
+  currentVisit = 0;
+
   constructor(private clusterService: ClusterServiceService,
-              private patientData: PatientData) {
+              private patientData: PatientData,
+              private constants: GlobalConstants) {
   }
 
   ngOnInit(): void {
     this.clusterService.loadedData.subscribe((isLoaded: boolean) => {
       if (isLoaded) {
         console.log('loaded');
+        this.dataAvailable = true;
         this.initializeVisualization();
       }
     });
+  }
+
+  nextVisit(): void {
+    if (this.dataAvailable && this.currentVisit < 2) {
+      this.currentVisit++;
+      this.initializeVisualization();
+    }
+  }
+
+  previousVisit(): void {
+    if (this.dataAvailable && this.currentVisit > 0) {
+      this.currentVisit--;
+      this.initializeVisualization();
+    }
   }
 
   initializeVisualization(): void {
@@ -29,20 +49,20 @@ export class ClusterGraphComponent implements OnInit {
     d3.selectAll('g').remove();
 
     const clusterMap: Map<number, number[][]> = this.clusterService.getClusters();
-    const clusterVisit1 = clusterMap.get(0) as number[][];
 
     const width = 750;
     const height = 300;
+
+
+    const visitCluster = clusterMap.get(this.currentVisit);
+
 
     const pack = d3.pack()
       .size([width, height])
       .padding(3);
 
-    const packedData = pack(d3.hierarchy({children: clusterVisit1})
+    const packedData = pack(d3.hierarchy({children: visitCluster})
       .sum(d => Array.isArray(d) ? d.length : 0));
-
-    console.log(packedData);
-    console.log(packedData.leaves());
 
     const leaf = d3.select('#cluster')
       .selectAll('g')
@@ -56,19 +76,28 @@ export class ClusterGraphComponent implements OnInit {
 
     leaf.append('text')
       .selectAll('tspan')
-      .data((d) => {
-        const clusterMembers = [];
+      .data(d => {
+        let clusterMembers = '';
+        let j = 1;
         for (const v of d.data as number[]) {
-          clusterMembers.push(v);
+          if (j % 3 === 0) {
+            clusterMembers = clusterMembers + v + ' ';
+          } else {
+            clusterMembers = clusterMembers + v + '-';
+          }
+          j++;
         }
         console.log(clusterMembers);
-        return clusterMembers;
+        return clusterMembers.split(/(?=[A-Z][a-z])|\s+/g);
       })
       .join('tspan')
-      .style('font-size', '9px')
-      .attr('x', 0)
-      .attr('y', (d, i, nodes) => `${i - nodes.length / 2 + 0.8}em`)
-      .text(d => d);
-  }
+      .style('font-size', '10px')
+      .attr('x', -20)
+      .attr('y', (d, i, nodes) => `${i - nodes.length / 2 + 1}em`)
+      .text(d => {
+        return d;
+      });
 
+
+  }
 }
