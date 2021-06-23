@@ -142,7 +142,7 @@
     </div>
 
     <div class="modal-footer">
-      <button (click)="refreshCategories()" [disabled]="this.noCatSelected()" class="btn btn-success" type="button">Refresh</button>
+      <button (click)="refreshCategories()" [disabled]="this.noCatSelected() || !this.fileRead" class="btn btn-success" type="button">Refresh</button>
     </div>
 
 

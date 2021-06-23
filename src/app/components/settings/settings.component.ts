@@ -10,6 +10,7 @@ import {ClusterServiceService} from '../../services/cluster-service.service';
 import * as math from 'mathjs';
 import {Matrix} from 'mathjs';
 import {ClusterGraphComponent} from '../cluster-graph/cluster-graph.component';
+import {EgoGraphService} from '../../services/ego-graph.service';
 
 
 @Component({
@@ -19,11 +20,14 @@ import {ClusterGraphComponent} from '../cluster-graph/cluster-graph.component';
 })
 export class SettingsComponent implements OnInit {
 
+  fileRead = false;
+
   constructor(private formBuilder: FormBuilder,
               private dosService: DegreeOfSimilarityService,
               public patientData: PatientData,
               private constants: GlobalConstants,
-              private clusterService: ClusterServiceService) {
+              private clusterService: ClusterServiceService,
+              private egoGraphService: EgoGraphService) {
     /*
     sfVitality: [true, Validators.required],
     sfPhysicalFunctioning: [true, Validators.required],
@@ -98,7 +102,7 @@ export class SettingsComponent implements OnInit {
    * updates which categories are chosen by the user and stores it in an array (activeCategories)
    */
   refreshCategories(): void {
-    console.log(this.patientData.activeCategories);
+
     this.dosService.initiateDosCalculation();
     this.clusterService.initializeClustering();
     let countCompleted = 0;
@@ -141,6 +145,7 @@ export class SettingsComponent implements OnInit {
    * @param fileInput csv file chosen by user
    */
   readCsv(fileInput: any): void {
+    this.fileRead = true;
     this.resetPatientData();
     const fileRead = fileInput.target.files[0];
     const reader: FileReader = new FileReader();

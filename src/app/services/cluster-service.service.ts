@@ -128,7 +128,10 @@ export class ClusterServiceService {
    */
   private expand(visit: number): void {
     console.log('expand');
+    const t0 = Date.now();
     this.visits[visit] = math.sparse(math.pow(this.visits[visit], this.expandFactor) as Matrix);
+    const t1 = Date.now();
+    console.log('time: ' + ((t1 - t0) / 1000).toFixed(2) + ' seconds');
   }
 
   /**
