@@ -183,7 +183,7 @@ export class ClusterServiceService {
         const rowMatrix = M.subset(math.index(i, math.range(0, M.size()[0])));
         let cluster = this.rowMatrixToArray(rowMatrix).map(
           (value, index) => {
-            return (value > 0.01) ? index : -1;
+            return (value > 0.01) ? index + 1 : -1;
           });
         cluster = cluster.filter((value) => value >= 0);
         if (cluster.length > 1 && !this.alreadyIn(clusters, cluster)) {

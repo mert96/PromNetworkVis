@@ -120,13 +120,12 @@ export class ClusterGraphComponent implements OnInit {
         const values = d.data as number[];
         for (const v of values) {
           if (j % 3 === 0) {
-            clusterMembers = clusterMembers + (v + 1) + ' ';
+            clusterMembers = clusterMembers + (v) + ' ';
           } else {
-            clusterMembers = clusterMembers + (v + 1) + '/';
+            clusterMembers = clusterMembers + (v) + '/';
           }
           j++;
         }
-        console.log(clusterMembers);
         return clusterMembers.split(/(?=[A-Z][a-z])|\s+/g);
       })
       .join('tspan')

@@ -130,4 +130,33 @@ export class DegreeOfSimilarityService {
 
     return [+i, +j];
   }
+
+  /**
+   * takes 2 different patient IDs in no particular order and returns the corresponding DoS value.
+   * @param idA Patient ID
+   * @param idB Patient ID, idA =/= idB
+   */
+  getScore(idA: number, idB: number, v: number): number {
+
+    if (idA > idB) {
+      const h = idB;
+      idB = idA;
+      idA = h;
+    }
+
+    let result = -1;
+    let keyAB = '';
+
+    this.dosMap.forEach((value, key) => {
+      if (key === 'A' + idA + ':' + 'B' + idB + ':' + 'V' + (v + 1)) {
+        result = value;
+        keyAB = key;
+        return;
+      }
+    });
+
+    console.log(idA, idB, v, keyAB);
+
+    return result;
+  }
 }
