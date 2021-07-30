@@ -32,7 +32,7 @@ export class NodelinkComponent implements OnInit {
 
   private selectedPatients: number[] = [];
 
-  private NODE_RADIUS = 10;
+  private NODE_RADIUS = 15;
 
   constructor(private clusterService: ClusterServiceService,
               private dosService: DegreeOfSimilarityService) {
@@ -57,7 +57,6 @@ export class NodelinkComponent implements OnInit {
   initializeNodeLink(): void {
     // build graph from loaded data
     this.loadDataToGraph();
-    console.log(this.graph);
 
     // make sure you load data before initializing/rendering
     if (this.graph) {
@@ -294,7 +293,6 @@ export class NodelinkComponent implements OnInit {
       .attr('stroke-width', 1.5)
       .attr('r', this.NODE_RADIUS)
       .attr('cx', (d: Node) => {
-        console.log(d, d.x);
         return d.x as number;
       })
       .attr('cy', (d: Node) => {
@@ -338,7 +336,7 @@ export class NodelinkComponent implements OnInit {
         return colScale(d.score) as string;
       })
       .attr('stroke-opacity', 1)
-      .attr('stroke-width', 2)
+      .attr('stroke-width', 4)
       .on('click', (event, d: Link<Node>) => {
         d3.select('#selectedDoS')
           .text('selected DoS: ' + d.score);
@@ -359,6 +357,12 @@ export class NodelinkComponent implements OnInit {
     // EXIT
     this.links.exit().remove();
 
+    this.svgContainer.append('rect')
+      .attr('x', 0)
+      .attr('y', 0)
+      .attr('width', 154)
+      .attr('height', 50)
+      .attr('fill', 'yellow');
     this.svgContainer.append('text')
       .text('min. DoS: ' + colScale.domain()[0] + ' (red)')
       .style('font-size', '15px')

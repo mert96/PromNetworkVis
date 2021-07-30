@@ -156,8 +156,6 @@ export class DegreeOfSimilarityService {
       }
     });
 
-    console.log(idA, idB, v, keyAB);
-
     return result;
   }
 }

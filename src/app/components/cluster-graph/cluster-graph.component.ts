@@ -103,11 +103,21 @@ export class ClusterGraphComponent implements OnInit {
       .join('g')
       .on('click', (event, d) => {
         this.clusterService.setSelectedCluster(d.data as number[]);
+
+        const colorScale = d3.scaleLinear<string>()
+          .domain([minRad, maxRad])
+          .range(['#c75eee', '#3785ee']);
+
+        d3.selectAll('#clusterCircle')
+          .attr('fill', (o: any) => {
+            return d.x === o.x && d.y === o.y ? 'yellow' : colorScale(o.r);
+          });
       })
       .attr('id', 'cluster-circle')
       .attr('transform', d => `translate(${d.x + 1},${d.y + 1})`);
 
     leaf.append('circle')
+      .attr('id', 'clusterCircle')
       .attr('r', d => {
         if (maxRad < d.r) {
           maxRad = d.r;
