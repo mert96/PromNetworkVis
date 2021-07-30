@@ -23,7 +23,7 @@ export class EgoGraphComponent implements OnInit {
   private selectedPatientData!: Map<number, number[]>;
 
   width = 750;
-  height = 250;
+  height = 350;
 
   private svgContainer!: d3.Selection<SVGElement, {}, HTMLElement, any>;
   private g!: d3.Selection<SVGGElement, {}, HTMLElement, any>;
@@ -39,7 +39,10 @@ export class EgoGraphComponent implements OnInit {
   ngOnInit(): void {
     this.clusterService.loadedData.subscribe((isLoaded: boolean) => {
       if (isLoaded) {
+        d3.selectAll('#ego-group').remove();
+        d3.selectAll('rect').remove();
         this.dataAvailable = true;
+        this.resetSelectedPatient();
         this.getCompletedPatients();
       }
     });
@@ -47,11 +50,16 @@ export class EgoGraphComponent implements OnInit {
   }
 
   getCompletedPatients(): void {
+    this.completedPatients = [];
     this.patientData.patients.forEach(value => {
       if (value.completed) {
         this.completedPatients.push(value);
       }
     });
+  }
+
+  resetSelectedPatient(): void {
+    this.selectedPatient = null;
   }
 
   setSelectedPatient(p: Patient): void {
@@ -85,6 +93,7 @@ export class EgoGraphComponent implements OnInit {
   drawGraph(): void {
 
     d3.selectAll('#ego-group').remove();
+    d3.selectAll('rect').remove();
 
     this.zoom = d3.zoom()
       .scaleExtent([0.1, 10])
@@ -103,17 +112,17 @@ export class EgoGraphComponent implements OnInit {
     this.g.append('text')
       .style('font-size', '10px')
       .attr('x', 30)
-      .attr('y', 60 + 35 * 0)
+      .attr('y', 60 + 60 * 0)
       .text('Visit 1');
     this.g.append('text')
       .style('font-size', '10px')
       .attr('x', 30)
-      .attr('y', 60 + 35 * 1)
+      .attr('y', 60 + 60 * 1)
       .text('Visit 2');
     this.g.append('text')
       .style('font-size', '10px')
       .attr('x', 30)
-      .attr('y', 60 + 35 * 2)
+      .attr('y', 60 + 60 * 2)
       .text('Visit 3');
 
     const data = this.prepareData();
@@ -131,8 +140,18 @@ export class EgoGraphComponent implements OnInit {
     let j = 0;
 
     node.append('rect')
-      .on('mouseover', (d, i) => {
-
+      .on('mouseover', (d, i: { patientId?: number; visitId?: number; dos?: number; }) => {
+        // console.log(d, i);
+        // this.g
+        //   .append('text')
+        //   .style('font-size', '10px')
+        //   .attr('id', 'hoverText')
+        //   .attr('x', d.layerX)
+        //   .attr('y', d.layerY)
+        //   .text(i.dos + '');
+      })
+      .on('mouseout', (d: { patientId?: number; visitId?: number; dos?: number; }, i) => {
+        // d3.selectAll('#hoverText').remove();
       })
       .attr('x', (d: { patientId?: number; visitId?: number; dos?: number; }, i, nodes) => {
         if (d.visitId !== currentVisit) {
@@ -144,10 +163,10 @@ export class EgoGraphComponent implements OnInit {
         return dist;
       })
       .attr('y', (d: { patientId?: number; visitId?: number; dos?: number; }) => {
-        return 50 + 35 * (d.visitId as number);
+        return 50 + 60 * (d.visitId as number);
       })
       .attr('width', 30)
-      .attr('height', 20)
+      .attr('height', 50)
       .attr('fill', (d: { patientId?: number; visitId?: number; dos?: number; }) => {
         const colScale = d3.scaleLinear<string>()
           .domain([0.80, 1])
@@ -162,16 +181,38 @@ export class EgoGraphComponent implements OnInit {
           j = 0;
           currentVisit = d.visitId as number;
         }
-        const dist = 71 + (j * 40);
+        const dist = 72 + (j * 40);
         j++;
         return dist;
       })
       .attr('y', (d: { patientId?: number; visitId?: number; dos?: number; }) => {
-        return 60 + 35 * (d.visitId as number);
+        return 60 + (60 * (d.visitId as number));
+        // TODO bug when ego graph only has nodes in one visit
       })
       .text((d: { patientId?: number; visitId?: number; dos?: number; }) => {
-        return '' + d.patientId + ':' + d.dos;
+        return 'ID: ' + d.patientId;
       });
+
+    node.append('text')
+      .style('font-size', '10px')
+      .attr('x', (d: { patientId?: number; visitId?: number; dos?: number; }, i, nodes) => {
+        if (d.visitId !== currentVisit) {
+          j = 0;
+          currentVisit = d.visitId as number;
+        }
+        const dist = 75 + (j * 40);
+        j++;
+        return dist;
+      })
+      .attr('y', (d: { patientId?: number; visitId?: number; dos?: number; }) => {
+        return 90 + (60 * (d.visitId as number));
+        // TODO bug when ego graph only has nodes in one visit
+      })
+      .text((d: { patientId?: number; visitId?: number; dos?: number; }) => {
+        return '' + d.dos;
+      });
+
+    this.resetZoom();
 
   }
 

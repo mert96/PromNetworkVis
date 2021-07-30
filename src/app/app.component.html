@@ -1,20 +1,25 @@
-<div class="container row">
-  <div class="col m-0">
-    <app-settings></app-settings>
-  </div>
-  <div class="col-8 m-0">
-    <div class="row m-0">
-      <app-cluster-graph></app-cluster-graph>
+<div class="container-lg">
+  <div class="row row-cols-3">
+    <div class="col m-0">
+      <app-settings></app-settings>
     </div>
-    <div class="row m-0">
-      <app-ego-graph></app-ego-graph>
+    <div class="col m-0">
+      <div class="row m-0">
+        <app-cluster-graph></app-cluster-graph>
+      </div>
+      <div class="row m-0">
+        <app-ego-graph></app-ego-graph>
+      </div>
+    </div>
+    <div class="col-0 m-0">
+      <div class="row m-0">
+        <app-nodelink></app-nodelink>
+      </div>
+      <div class="row m-0">
+
+      </div>
     </div>
 
   </div>
-  <div class="col m-0">
-
-  </div>
-
 </div>
-
 <router-outlet></router-outlet>

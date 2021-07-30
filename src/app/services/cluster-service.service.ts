@@ -15,18 +15,38 @@ export class ClusterServiceService {
   inflateFactor = 3;
   maxLoops = 10;
 
+  // To make the graph components load when data is available
   loadedData: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
+  selectedCluster: BehaviorSubject<number[]> = new BehaviorSubject<number[]>([]);
+
   clusterMap: Map<number, number[][]> = new Map<number, number[][]>();
   visits: Matrix[] = [];
+
+  private currentClusterGraphVisit: number = 0;
 
   constructor(private dos: DegreeOfSimilarityService,
               private constants: GlobalConstants) {
   }
 
+  /**
+   * set whether data is loaded
+   * @param b which indicates loading status of data
+   */
   setLoadedData(b: boolean): void {
     this.loadedData.next(b);
   }
 
+  /**
+   * changes the cluster the user selected via clicking
+   * @param arr the selected patients
+   */
+  setSelectedCluster(arr: number[]): void{
+    this.selectedCluster.next(arr);
+  }
+
+  /**
+   * returns the clusters for every visit
+   */
   getClusters(): Map<number, number[][]> {
     return this.clusterMap;
   }
@@ -124,7 +144,7 @@ export class ClusterServiceService {
   */
 
   /**
-   *
+   * manages the expand step of the algorithm
    */
   private expand(visit: number): void {
     console.log('expand');
@@ -135,13 +155,18 @@ export class ClusterServiceService {
   }
 
   /**
-   *
+   * manages the inflate step of the algorithm
    */
   private inflate(visit: number): void {
     console.log('inflate');
     this.visits[visit] = this.normalize(math.dotPow(this.visits[visit], this.inflateFactor) as Matrix);
   }
 
+  /**
+   * checks whether the algorithm is finished e.g the two matrices do not differ significantly
+   * @param E expanded matrix
+   * @param I inflated matrix
+   */
   private finished(E: Matrix, I: Matrix): boolean {
     let finished = true;
     const D: Matrix = math.subtract(E, I) as Matrix;
@@ -155,7 +180,7 @@ export class ClusterServiceService {
 
   /**
    * the core of the Markov Cluster Algorithm
-   * does the inflate/expand loop, with an already looped and normalized matrix
+   * does the inflate/expand call in a loop, with an already looped (added 1 to diagonal) and normalized matrix
    */
   private startMarkovClustering(visit: number): void {
 
@@ -175,6 +200,10 @@ export class ClusterServiceService {
     }
   }
 
+  /**
+   * once the algorithm finishes for a visit, here the clusters are extracted from the matrix
+   * @param M matrix from which to extract
+   */
   private extractClusters(M: Matrix): number [][] {
     const clusters = [];
 
@@ -194,6 +223,12 @@ export class ClusterServiceService {
     return clusters;
   }
 
+  /**
+   * checks whether the cluster is already extracted, since it is possible
+   * to extract the same cluster multiple times
+   * @param clusters all extracted clusters until now
+   * @param arr the cluster in contention
+   */
   private alreadyIn(clusters: number[][], arr: number[]): boolean {
     let contains = false;
     for (const cluster of clusters) {
@@ -207,6 +242,10 @@ export class ClusterServiceService {
     return contains;
   }
 
+  /**
+   * transform a row matrix to an array
+   * @param M row matrix
+   */
   rowMatrixToArray(M: Matrix): number[] {
     const numberOfColumns = M.size()[1];
     const rowArray = new Array(numberOfColumns);
@@ -216,12 +255,19 @@ export class ClusterServiceService {
     return rowArray;
   }
 
-
+  /**
+   * adds 1's to diagonal
+   * @param M matrix
+   */
   private addLoops(M: Matrix): Matrix {
     const diagonal = math.identity(M.size(), 'sparse');
     return math.add(M, diagonal) as Matrix;
   }
 
+  /**
+   * normalizes the matrix column wise
+   * @param M matrix
+   */
   private normalize(M: Matrix): Matrix {
     const columnSums = math.multiply(math.transpose(M), math.ones(M.size()[0]));
     const columnSumMatrix: Matrix = math.matrix('sparse');
@@ -229,5 +275,13 @@ export class ClusterServiceService {
       columnSumMatrix.subset(math.index(i, math.range(0, M.size()[0])), math.transpose(columnSums));
     }
     return math.dotDivide(M, columnSumMatrix) as Matrix;
+  }
+
+  getCurrentClusterGraphVisit(): number{
+    return this.currentClusterGraphVisit;
+  }
+
+  setCurrentClusterGraphVisit(v: number): void{
+    this.currentClusterGraphVisit = v;
   }
 }

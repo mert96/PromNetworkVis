@@ -11,13 +11,15 @@ import {GlobalConstants} from './global/globalConstants';
 import {ClusterGraphComponent} from './components/cluster-graph/cluster-graph.component';
 import {EgoGraphComponent} from './components/ego-graph/ego-graph.component';
 import {BsDropdownModule} from 'ngx-bootstrap/dropdown';
+import { NodelinkComponent } from './components/nodelink/nodelink.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     SettingsComponent,
     ClusterGraphComponent,
-    EgoGraphComponent
+    EgoGraphComponent,
+    NodelinkComponent
   ],
   imports: [
     BrowserModule,

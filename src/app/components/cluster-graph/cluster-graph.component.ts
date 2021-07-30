@@ -13,7 +13,7 @@ export class ClusterGraphComponent implements OnInit {
   currentVisit = 0;
 
   private width = 750;
-  private height = 300;
+  private height = 400;
 
   private svgContainer!: d3.Selection<SVGElement, {}, HTMLElement, any>;
   private g!: d3.Selection<SVGGElement, {}, HTMLElement, any>;
@@ -30,6 +30,7 @@ export class ClusterGraphComponent implements OnInit {
       .attr('y', 145)
       .text('Please read .csv file and press refresh');
 
+    // waits for the data to be loaded
     this.clusterService.loadedData.subscribe((isLoaded: boolean) => {
       if (isLoaded) {
         console.log('loaded');
@@ -41,20 +42,31 @@ export class ClusterGraphComponent implements OnInit {
     });
   }
 
+  /**
+   * switches to next visit by redrawing
+   */
   nextVisit(): void {
     if (this.dataAvailable && this.currentVisit < 2) {
       this.currentVisit++;
+      this.clusterService.setCurrentClusterGraphVisit(this.currentVisit);
       this.initializeVisualization();
     }
   }
 
+  /**
+   * switches to previous visit by redrawing
+   */
   previousVisit(): void {
     if (this.dataAvailable && this.currentVisit > 0) {
       this.currentVisit--;
+      this.clusterService.setCurrentClusterGraphVisit(this.currentVisit);
       this.initializeVisualization();
     }
   }
 
+  /**
+   * draws the graph using the d3js library
+   */
   initializeVisualization(): void {
 
     d3.selectAll('#cluster-circle').remove();
@@ -89,8 +101,8 @@ export class ClusterGraphComponent implements OnInit {
       .selectAll('g')
       .data(packedData.leaves())
       .join('g')
-      .on('click', () => {
-
+      .on('click', (event, d) => {
+        this.clusterService.setSelectedCluster(d.data as number[]);
       })
       .attr('id', 'cluster-circle')
       .attr('transform', d => `translate(${d.x + 1},${d.y + 1})`);

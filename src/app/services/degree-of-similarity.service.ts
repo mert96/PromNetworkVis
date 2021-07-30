@@ -135,6 +135,7 @@ export class DegreeOfSimilarityService {
    * takes 2 different patient IDs in no particular order and returns the corresponding DoS value.
    * @param idA Patient ID
    * @param idB Patient ID, idA =/= idB
+   * @param v a number representing which visit to look at
    */
   getScore(idA: number, idB: number, v: number): number {
 
