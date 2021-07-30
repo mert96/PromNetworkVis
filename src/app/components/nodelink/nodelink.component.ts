@@ -50,6 +50,8 @@ export class NodelinkComponent implements OnInit {
         this.selectedPatients = clicked;
         // console.log(Date.now(), this.selectedPatients);
         this.initializeNodeLink();
+      } else if (clicked.length === 0) {
+        this.clearSVG();
       }
     });
   }
@@ -203,32 +205,6 @@ export class NodelinkComponent implements OnInit {
 
     // start simulation and set target (=when does the simulation converge)
     this.simulation.alphaTarget(0).restart();
-
-    // // invisible circle for placing nodes
-    // // it's actually two arcs so we can use the getPointAtLength() and getTotalLength() methods
-    // const dim = -900;
-    // const circle = this.svgContainer.append('path')
-    //   .attr('d', 'M 40, ' + (dim / 2 + 40) + ' a ' + dim / 2 + ',' + dim / 2 + ' 0 1,0 ' + dim + ',0 a ' + dim / 2 + ',' + dim / 2 + ' 0 1,0 ' + dim * -1 + ',0')
-    //   .style('fill', '#f5f5f5');
-    //
-    // // evenly spaces nodes along arc
-    // const circleCoord = (node: any, index: any, num_nodes: any) => {
-    //   const circumference = circle.node()!.getTotalLength();
-    //   const pointAtLength = (l: any) => {
-    //     return circle.node()!.getPointAtLength(l);
-    //   };
-    //   const sectionLength = (circumference) / num_nodes;
-    //   const position = sectionLength * index + sectionLength / 2;
-    //   return pointAtLength(circumference - position);
-    // };
-    //
-    // // set coordinates for container nodes
-    // this.graph.nodes!.forEach((n, i) => {
-    //   const coord = circleCoord(n, i, this.graph.nodes!.length);
-    //   n.x = coord.x;
-    //   n.y = coord.y;
-    //
-    // });
   }
 
   calculateColorScale(): ScaleLinear<string, unknown> {
@@ -255,8 +231,8 @@ export class NodelinkComponent implements OnInit {
 
   init(): void {
     // create nodes and link selection (containers of our cicle and line objects)
-    this.nodes = this.g.append('g').attr('class', 'nodes').selectAll('.node');
     this.links = this.g.append('g').attr('class', 'links').selectAll('.link');
+    this.nodes = this.g.append('g').attr('class', 'nodes').selectAll('.node');
 
     // UPDATE data
     this.nodes = this.nodes.data(this.graph.nodes as Node[]);
@@ -271,17 +247,21 @@ export class NodelinkComponent implements OnInit {
 
         d.inFocus = !d.inFocus;
 
-        // set all other nodes not in focus (needed if a user clicks different nodes consecutively)
+        // set all other nodes to not in focus (needed if a user clicks different nodes consecutively)
         this.graph.nodes!.forEach((value: Node) => {
           if (value.id !== d.id) {
             value.inFocus = false;
           }
         });
 
+        const nodeCircles: d3.Selection<any, {}, any, any> = this.nodes.selectAll('circle');
+        nodeCircles.attr('fill', (o: Node) => {
+          return o.id === d.id ? 'rgb(144,159,8)' : 'darkgray';
+        });
+
         this.links.transition().style('stroke-opacity', (o) => {
           return (o.source === d || o.target === d) || !d.inFocus ? 1 : 0.1;
         });
-
 
       })
       .call(this.drag); // add drag behavior to nodes
@@ -340,7 +320,8 @@ export class NodelinkComponent implements OnInit {
       .on('click', (event, d: Link<Node>) => {
         d3.select('#selectedDoS')
           .text('selected DoS: ' + d.score);
-      });
+      })
+      .lower();
     // .on('mouseover', (event: MouseEvent, d: Link<Node>) => {
     //   d3.select('#selectedDoS')
     //     .text('selected DoS: ' + d.score);
@@ -416,6 +397,8 @@ export class NodelinkComponent implements OnInit {
       .attr('y', (d: Node) => {
         return d.y as number + this.NODE_RADIUS;
       });
+
+
   }
 
 }

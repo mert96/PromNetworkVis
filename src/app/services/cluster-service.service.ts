@@ -16,13 +16,13 @@ export class ClusterServiceService {
   maxLoops = 10;
 
   // To make the graph components load when data is available
-  loadedData: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
-  selectedCluster: BehaviorSubject<number[]> = new BehaviorSubject<number[]>([]);
+  loadedData: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false); // ego and cluster graph
+  selectedCluster: BehaviorSubject<number[]> = new BehaviorSubject<number[]>([]); // node-link
 
   clusterMap: Map<number, number[][]> = new Map<number, number[][]>();
   visits: Matrix[] = [];
 
-  private currentClusterGraphVisit: number = 0;
+  private currentClusterGraphVisit = 0;
 
   constructor(private dos: DegreeOfSimilarityService,
               private constants: GlobalConstants) {
@@ -40,7 +40,7 @@ export class ClusterServiceService {
    * changes the cluster the user selected via clicking
    * @param arr the selected patients
    */
-  setSelectedCluster(arr: number[]): void{
+  setSelectedCluster(arr: number[]): void {
     this.selectedCluster.next(arr);
   }
 
@@ -56,6 +56,8 @@ export class ClusterServiceService {
    * manages the calculation of the clusters
    */
   initializeClustering(): void {
+
+    this.setSelectedCluster([]);
 
     this.visits = [];
 
@@ -277,11 +279,11 @@ export class ClusterServiceService {
     return math.dotDivide(M, columnSumMatrix) as Matrix;
   }
 
-  getCurrentClusterGraphVisit(): number{
+  getCurrentClusterGraphVisit(): number {
     return this.currentClusterGraphVisit;
   }
 
-  setCurrentClusterGraphVisit(v: number): void{
+  setCurrentClusterGraphVisit(v: number): void {
     this.currentClusterGraphVisit = v;
   }
 }

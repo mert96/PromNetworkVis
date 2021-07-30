@@ -37,8 +37,16 @@ export class EgoGraphComponent implements OnInit {
   }
 
   ngOnInit(): void {
+
+    d3.select('#ego-svg')
+      .append('text')
+      .attr('x', 250)
+      .attr('y', 145)
+      .text('Please read .csv file and press refresh');
+
     this.clusterService.loadedData.subscribe((isLoaded: boolean) => {
       if (isLoaded) {
+        d3.selectAll('text')
         d3.selectAll('#ego-group').remove();
         d3.selectAll('rect').remove();
         this.dataAvailable = true;

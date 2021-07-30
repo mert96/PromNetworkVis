@@ -21,6 +21,7 @@ import {EgoGraphService} from '../../services/ego-graph.service';
 export class SettingsComponent implements OnInit {
 
   fileRead = false;
+  firstRead = true;
 
   constructor(private formBuilder: FormBuilder,
               private dosService: DegreeOfSimilarityService,
@@ -100,6 +101,7 @@ export class SettingsComponent implements OnInit {
 
   /**
    * updates which categories are chosen by the user and stores it in an array (activeCategories)
+   * and calculates Clusters and DoS
    */
   refreshCategories(): void {
 
@@ -146,7 +148,7 @@ export class SettingsComponent implements OnInit {
    */
   readCsv(fileInput: any): void {
     this.fileRead = true;
-    this.resetPatientData();
+    // this.resetPatientData();
     const fileRead = fileInput.target.files[0];
     const reader: FileReader = new FileReader();
     reader.readAsText(fileRead);
@@ -155,6 +157,10 @@ export class SettingsComponent implements OnInit {
       this.preparePatientData(patientData);
       // console.log(this.patientData.visits);
       console.log(this.patientData.patients);
+      if (!this.firstRead) {
+        this.refreshCategories();
+      }
+      this.firstRead = false;
     };
   }
 
