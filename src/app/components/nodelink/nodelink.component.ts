@@ -75,24 +75,15 @@ export class NodelinkComponent implements OnInit {
   }
 
   loadDataToGraph(): void {
-    // let xValueIterator = 0;
-    // let yValueIterator = 0;
     this.graph = new Graph();
     const nodes: Node[] = [];
     for (let i = 0; i < this.selectedPatients.length; i++) {
       const node = new Node();
       node.id = this.selectedPatients[i];
       node.label = 'Patient ' + this.selectedPatients[i];
-
-      // node.x = 0;
-      // node.y = 0;
-      // node.x = xValueIterator;
-      // xValueIterator += 50;
-      // yValueIterator += 25;
-      // if (xValueIterator % 250 === 0) {
-      //   xValueIterator = 0;
-      // }
-      // node.y = yValueIterator;
+      node.inFocus = false;
+      node.x = 0;
+      node.y = 0;
       nodes.push(node);
     }
     const links: Link<Node>[] = [];
@@ -203,7 +194,7 @@ export class NodelinkComponent implements OnInit {
     this.simulation = d3.forceSimulation<Node>(this.graph.nodes)
       .force('link', d3.forceLink<Node, Link<Node>>(this.graph.links as Link<Node>[]))
       .force('charge', d3.forceManyBody()
-        .strength(-400))
+        .strength(-1000))
       .force('center', d3.forceCenter(this.width / 2, this.height / 2));
 
     this.simulation.on('tick', () => {
@@ -214,31 +205,31 @@ export class NodelinkComponent implements OnInit {
     // start simulation and set target (=when does the simulation converge)
     this.simulation.alphaTarget(0).restart();
 
-    // invisible circle for placing nodes
-    // it's actually two arcs so we can use the getPointAtLength() and getTotalLength() methods
-    const dim = -900;
-    const circle = this.svgContainer.append('path')
-      .attr('d', 'M 40, ' + (dim / 2 + 40) + ' a ' + dim / 2 + ',' + dim / 2 + ' 0 1,0 ' + dim + ',0 a ' + dim / 2 + ',' + dim / 2 + ' 0 1,0 ' + dim * -1 + ',0')
-      .style('fill', '#f5f5f5');
-
-    // evenly spaces nodes along arc
-    const circleCoord = (node: any, index: any, num_nodes: any) => {
-      const circumference = circle.node()!.getTotalLength();
-      const pointAtLength = (l: any) => {
-        return circle.node()!.getPointAtLength(l);
-      };
-      const sectionLength = (circumference) / num_nodes;
-      const position = sectionLength * index + sectionLength / 2;
-      return pointAtLength(circumference - position);
-    };
-
-    // set coordinates for container nodes
-    this.graph.nodes!.forEach((n, i) => {
-      const coord = circleCoord(n, i, this.graph.nodes!.length);
-      n.x = coord.x;
-      n.y = coord.y;
-
-    });
+    // // invisible circle for placing nodes
+    // // it's actually two arcs so we can use the getPointAtLength() and getTotalLength() methods
+    // const dim = -900;
+    // const circle = this.svgContainer.append('path')
+    //   .attr('d', 'M 40, ' + (dim / 2 + 40) + ' a ' + dim / 2 + ',' + dim / 2 + ' 0 1,0 ' + dim + ',0 a ' + dim / 2 + ',' + dim / 2 + ' 0 1,0 ' + dim * -1 + ',0')
+    //   .style('fill', '#f5f5f5');
+    //
+    // // evenly spaces nodes along arc
+    // const circleCoord = (node: any, index: any, num_nodes: any) => {
+    //   const circumference = circle.node()!.getTotalLength();
+    //   const pointAtLength = (l: any) => {
+    //     return circle.node()!.getPointAtLength(l);
+    //   };
+    //   const sectionLength = (circumference) / num_nodes;
+    //   const position = sectionLength * index + sectionLength / 2;
+    //   return pointAtLength(circumference - position);
+    // };
+    //
+    // // set coordinates for container nodes
+    // this.graph.nodes!.forEach((n, i) => {
+    //   const coord = circleCoord(n, i, this.graph.nodes!.length);
+    //   n.x = coord.x;
+    //   n.y = coord.y;
+    //
+    // });
   }
 
   calculateColorScale(): ScaleLinear<string, unknown> {
@@ -277,8 +268,22 @@ export class NodelinkComponent implements OnInit {
       .append('g')
       .attr('class', 'node')
       .style('cursor', 'pointer')
-      .on('click', () => {
-        // define event handlers here
+      .on('click', (event: MouseEvent, d: Node) => {
+
+        d.inFocus = !d.inFocus;
+
+        // set all other nodes not in focus (needed if a user clicks different nodes consecutively)
+        this.graph.nodes!.forEach((value: Node) => {
+          if (value.id !== d.id) {
+            value.inFocus = false;
+          }
+        });
+
+        this.links.transition().style('stroke-opacity', (o) => {
+          return (o.source === d || o.target === d) || !d.inFocus ? 1 : 0.1;
+        });
+
+
       })
       .call(this.drag); // add drag behavior to nodes
 

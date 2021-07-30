@@ -22,6 +22,7 @@ export class Node implements d3.SimulationNodeDatum {
   fy?: number;
   label?: string;
   id?: number;
+  inFocus?: boolean;
 }
 
 export class Graph {
