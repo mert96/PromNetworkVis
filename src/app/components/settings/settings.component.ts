@@ -7,9 +7,6 @@ import {DegreeOfSimilarityService} from '../../services/degree-of-similarity.ser
 import {PatientData} from '../../global/patientData';
 import {GlobalConstants} from '../../global/globalConstants';
 import {ClusterServiceService} from '../../services/cluster-service.service';
-import * as math from 'mathjs';
-import {Matrix} from 'mathjs';
-import {ClusterGraphComponent} from '../cluster-graph/cluster-graph.component';
 import {EgoGraphService} from '../../services/ego-graph.service';
 
 
@@ -71,7 +68,7 @@ export class SettingsComponent implements OnInit {
   toggleAll(prefix: string): void {
     const sfCategories = ['QSVT', 'QSPF', 'QSBP', 'QSGP', 'QSRP', 'QSSO', 'QSRE', 'QSME'];
     const vfqCategories = ['QSBGH', 'QSBGV', 'QSOP', 'QSNA', 'QSDA', 'QSSF', 'QSMH'
-      , 'QSRD', 'QSDP', 'QSDV', 'QSCV', 'QSPV'];
+      , 'QSRD', 'QSDP', 'QSDV', 'QSCV', 'QSPV', 'LETTERS4MRIGHT', 'LETTERS4MLEFT'];
 
     let categories: string[] = [];
     if (prefix === 'sf') {
@@ -210,7 +207,7 @@ export class SettingsComponent implements OnInit {
      * 46 <= i < 96 because those number correspond to the column numbers of
      * the relevant scores
      */
-    for (let i = 46; i < 91; i++) {
+    for (let i = 46; i < 96; i++) {
       scores.pushScore(keys[i], +currentEntry[keys[i]]);
     }
 

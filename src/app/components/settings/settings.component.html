@@ -137,6 +137,18 @@
                                   (change)="patientData.activeCategories.set('QSPV', !this.patientData.activeCategories.get('QSPV'))">
           peripheral vision</label>
       </div>
+
+      <div class="form-group my-1">
+        <label for="4mRight"><input id="4mRight" type="checkbox" [checked]="this.patientData.activeCategories.get('LETTERS4MRIGHT')"
+                                  (change)="patientData.activeCategories.set('LETTERS4MRIGHT', !this.patientData.activeCategories.get('LETTERS4MRIGHT'))">
+          4M right eye</label>
+      </div>
+
+      <div class="form-group my-1">
+        <label for="4mLeft"><input id="4mLeft" type="checkbox" [checked]="this.patientData.activeCategories.get('LETTERS4MLEFT')"
+                                  (change)="patientData.activeCategories.set('LETTERS4MLEFT', !this.patientData.activeCategories.get('LETTERS4MLEFT'))">
+          4M left eye</label>
+      </div>
     </div>
 
     <div class="d-flex justify-content-between">

@@ -289,11 +289,11 @@ export class NodelinkComponent implements OnInit {
         // color selected node darkyellow
         const nodeCircles: d3.Selection<any, {}, any, any> = this.nodes.selectAll('circle');
         nodeCircles.attr('fill', (o: Node) => {
-          return o.id === d.id ? 'rgb(144,159,8)' : 'darkgray';
+          return o.id === d.id && o.inFocus ? 'rgb(144,159,8)' : 'darkgray';
         });
 
         this.links.transition().style('stroke-opacity', (o) => {
-          return (o.source === d || o.target === d) || !d.inFocus ? 1 : 0.1;
+          return (o.source === d || o.target === d) || !d.inFocus ? 1 : 0.05;
         });
 
       })
@@ -319,10 +319,10 @@ export class NodelinkComponent implements OnInit {
         return d.label as string;
       })
       .attr('x', (d: Node) => {
-        return d.x as number - this.NODE_RADIUS / 2;
+        return d.x as number - this.NODE_RADIUS / 2.2;
       })
       .attr('y', (d: Node) => {
-        return d.y as number + this.NODE_RADIUS / 2;
+        return d.y as number + this.NODE_RADIUS / 1.8;
       })
       .attr('stroke', 'white')
       .attr('stroke-width', 2)
@@ -352,9 +352,12 @@ export class NodelinkComponent implements OnInit {
       .attr('stroke-width', 4)
       .on('mouseover', (event: MouseEvent, d: Link<Node>) => {
         const line: SVGLineElement = event.currentTarget as SVGLineElement;
-        line.setAttribute('stroke', 'yellow');
-        tooltip
-          .style('opacity', 1);
+
+        if ((d.target as Node).inFocus || (d.source as Node).inFocus || this.noFocusedNode()) {
+          line.setAttribute('stroke', 'yellow');
+          tooltip
+            .style('opacity', 1);
+        }
 
       })
       .on('mousemove', (event: MouseEvent, d: Link<Node>) => {
@@ -395,6 +398,19 @@ export class NodelinkComponent implements OnInit {
       .attr('y', 30);
 
     this.resetZoom();
+  }
+
+  /**
+   * returns true if no node is focused
+   */
+  noFocusedNode(): boolean {
+    let focusedNodesExist = false;
+    this.graph.nodes!.forEach((n) => {
+      if (n.inFocus){
+        focusedNodesExist = true;
+      }
+    });
+    return !focusedNodesExist;
   }
 
   render(): void {

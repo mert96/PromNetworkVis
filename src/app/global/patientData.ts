@@ -27,6 +27,8 @@ export class PatientData {
     ['QSDP', true],
     ['QSDV', true],
     ['QSCV', true],
-    ['QSPV', true]
+    ['QSPV', true],
+    ['LETTERS4MRIGHT', true],
+    ['LETTERS4MLEFT', true]
   ]);
 }
