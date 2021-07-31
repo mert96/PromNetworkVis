@@ -45,6 +45,9 @@ export class NodelinkComponent implements OnInit {
 
   ngOnInit(): void {
 
+    /**
+     * listen for click in cluster graph
+     */
     this.clusterService.selectedCluster.subscribe((clicked: number[]) => {
       if (clicked.length !== 0 && !this.equals(clicked, this.selectedPatients)) {
         this.selectedPatients = clicked;
@@ -56,6 +59,9 @@ export class NodelinkComponent implements OnInit {
     });
   }
 
+  /**
+   * manages rendering and data processing
+   */
   initializeNodeLink(): void {
     // build graph from loaded data
     this.loadDataToGraph();
@@ -69,19 +75,25 @@ export class NodelinkComponent implements OnInit {
     }
   }
 
+  /**
+   * resets svg drawing board
+   */
   clearSVG(): void {
     if (this.svgContainer) {
       this.svgContainer.selectAll('*').remove();
     }
   }
 
+  /**
+   * create a graph (graph with list of nodes and links) from the passed patients
+   */
   loadDataToGraph(): void {
     this.graph = new Graph();
     const nodes: Node[] = [];
     for (let i = 0; i < this.selectedPatients.length; i++) {
       const node = new Node();
       node.id = this.selectedPatients[i];
-      node.label = 'Patient ' + this.selectedPatients[i];
+      node.label = '' + this.selectedPatients[i];
       node.inFocus = false;
       node.x = 0;
       node.y = 0;
@@ -169,6 +181,9 @@ export class NodelinkComponent implements OnInit {
     this.g.attr('transform', `scale(${scale})`);
   }
 
+  /**
+   * sets up zoom, dragging, simulation for node-link graph
+   */
   setup(): void {
     // setup zoom behavior
     this.zoom = d3.zoom()
@@ -207,6 +222,9 @@ export class NodelinkComponent implements OnInit {
     this.simulation.alphaTarget(0).restart();
   }
 
+  /**
+   * returns a d3 scale linear color scale to paint the links according to the DoS of its nodes
+   */
   calculateColorScale(): ScaleLinear<string, unknown> {
 
     let minScore = 1;
@@ -228,11 +246,25 @@ export class NodelinkComponent implements OnInit {
       .range(['#ee1100', '#097400']);
   }
 
-
+  /**
+   * appends everything to the svg
+   */
   init(): void {
     // create nodes and link selection (containers of our cicle and line objects)
+    // this.nodes will contain text and circles
     this.links = this.g.append('g').attr('class', 'links').selectAll('.link');
     this.nodes = this.g.append('g').attr('class', 'nodes').selectAll('.node');
+
+    // create a tooltip
+    const tooltip = d3.select('#master')
+      .append('div')
+      .style('opacity', 0)
+      .attr('class', 'tooltip')
+      .style('background-color', 'white')
+      .style('border', 'solid')
+      .style('border-width', '2px')
+      .style('border-radius', '5px')
+      .style('padding', '5px');
 
     // UPDATE data
     this.nodes = this.nodes.data(this.graph.nodes as Node[]);
@@ -254,6 +286,7 @@ export class NodelinkComponent implements OnInit {
           }
         });
 
+        // color selected node darkyellow
         const nodeCircles: d3.Selection<any, {}, any, any> = this.nodes.selectAll('circle');
         nodeCircles.attr('fill', (o: Node) => {
           return o.id === d.id ? 'rgb(144,159,8)' : 'darkgray';
@@ -286,10 +319,10 @@ export class NodelinkComponent implements OnInit {
         return d.label as string;
       })
       .attr('x', (d: Node) => {
-        return d.x as number + this.NODE_RADIUS;
+        return d.x as number - this.NODE_RADIUS / 2;
       })
       .attr('y', (d: Node) => {
-        return d.y as number + this.NODE_RADIUS;
+        return d.y as number + this.NODE_RADIUS / 2;
       })
       .attr('stroke', 'white')
       .attr('stroke-width', 2)
@@ -317,19 +350,25 @@ export class NodelinkComponent implements OnInit {
       })
       .attr('stroke-opacity', 1)
       .attr('stroke-width', 4)
-      .on('click', (event, d: Link<Node>) => {
-        d3.select('#selectedDoS')
-          .text('selected DoS: ' + d.score);
+      .on('mouseover', (event: MouseEvent, d: Link<Node>) => {
+        const line: SVGLineElement = event.currentTarget as SVGLineElement;
+        line.setAttribute('stroke', 'yellow');
+        tooltip
+          .style('opacity', 1);
+
       })
-      .lower();
-    // .on('mouseover', (event: MouseEvent, d: Link<Node>) => {
-    //   d3.select('#selectedDoS')
-    //     .text('selected DoS: ' + d.score);
-    // })
-    // .on('mouseout', () => {
-    //   d3.select('#selectedDoS')
-    //     .text('selected DoS: ');
-    // });
+      .on('mousemove', (event: MouseEvent, d: Link<Node>) => {
+        tooltip
+          .html('DoS = ' + d.score)
+          .style('left', (event.clientX + 20) + 'px')
+          .style('top', (event.clientY) + 'px');
+      })
+      .on('mouseout', (event: MouseEvent, d: Link<Node>) => {
+        const line: SVGLineElement = event.currentTarget as SVGLineElement;
+        line.setAttribute('stroke', colScale(d.score) as string);
+        tooltip
+          .style('opacity', 0);
+      });
 
     // JOIN
     this.links = this.links
@@ -341,8 +380,8 @@ export class NodelinkComponent implements OnInit {
     this.svgContainer.append('rect')
       .attr('x', 0)
       .attr('y', 0)
-      .attr('width', 154)
-      .attr('height', 50)
+      .attr('width', 150)
+      .attr('height', 40)
       .attr('fill', 'yellow');
     this.svgContainer.append('text')
       .text('min. DoS: ' + colScale.domain()[0] + ' (red)')
@@ -354,12 +393,6 @@ export class NodelinkComponent implements OnInit {
       .style('font-size', '15px')
       .attr('x', 10)
       .attr('y', 30);
-    this.svgContainer.append('text')
-      .text('selected DoS: ')
-      .style('font-size', '15px')
-      .attr('x', 10)
-      .attr('y', 45)
-      .attr('id', 'selectedDoS');
 
     this.resetZoom();
   }
@@ -392,10 +425,10 @@ export class NodelinkComponent implements OnInit {
     const nodesText: d3.Selection<any, {}, any, any> = this.nodes.selectAll('text');
     nodesText
       .attr('x', (d: Node) => {
-        return d.x as number + this.NODE_RADIUS;
+        return d.x as number - this.NODE_RADIUS / 2;
       })
       .attr('y', (d: Node) => {
-        return d.y as number + this.NODE_RADIUS;
+        return d.y as number + this.NODE_RADIUS / 2;
       });
 
 

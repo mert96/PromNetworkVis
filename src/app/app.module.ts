@@ -27,7 +27,7 @@ import { NodelinkComponent } from './components/nodelink/nodelink.component';
     ReactiveFormsModule,
     BsDropdownModule.forRoot(),
     BrowserAnimationsModule,
-    FormsModule
+    FormsModule,
   ],
   providers: [PatientData, GlobalConstants],
   bootstrap: [AppComponent]
