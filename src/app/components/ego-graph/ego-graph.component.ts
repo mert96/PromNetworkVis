@@ -5,6 +5,8 @@ import {ClusterServiceService} from '../../services/cluster-service.service';
 import {EgoGraphService} from '../../services/ego-graph.service';
 import * as d3 from 'd3';
 import {DegreeOfSimilarityService} from '../../services/degree-of-similarity.service';
+import {rgb} from 'd3';
+import {Link, Node} from '../nodelink/graph-objects/graph';
 
 @Component({
   selector: 'app-ego-graph',
@@ -21,6 +23,8 @@ export class EgoGraphComponent implements OnInit {
 
   // contains the similar patient id's for every visit of the selected Patient
   private selectedPatientData!: Map<number, number[]>;
+
+  private graphData!: object[];
 
   width = 750;
   height = 350;
@@ -95,6 +99,17 @@ export class EgoGraphComponent implements OnInit {
    */
   drawGraph(): void {
 
+    // create a tooltip
+    const tooltip = d3.select('#master')
+      .append('div')
+      .style('opacity', 0)
+      .attr('class', 'tooltip')
+      .style('background-color', 'white')
+      .style('border', 'solid')
+      .style('border-width', '2px')
+      .style('border-radius', '5px')
+      .style('padding', '5px');
+
     d3.selectAll('#ego-group').remove();
     d3.selectAll('rect').remove();
 
@@ -128,14 +143,66 @@ export class EgoGraphComponent implements OnInit {
       .attr('y', 60 + 60 * 2)
       .text('Visit 3');
 
-    const data = this.prepareData();
+    this.graphData = this.prepareData();
+
+    const colScale = d3.scaleLinear<string>()
+      .domain([0.80, 1])
+      .range(['#a5ee3c', '#097400']);
 
     const node = this.g
       .selectAll('g')
-      .data(data)
+      .data(this.graphData)
       .join('g')
-      .on('click', () => {
+      .on('click', (event, d: { patientId?: number; visitId?: number; dos?: number; clicked?: boolean; }) => {
+          const rects: d3.Selection<any, {}, any, any> = node.selectAll('rect');
+          rects
+            .attr('stroke', (o: { patientId?: number; visitId?: number; dos?: number; clicked?: boolean; }) => {
+              const alreadyClicked = o.clicked;
+              if (alreadyClicked) {
+                o.clicked = false;
+              } else {
+                o.clicked = o.patientId === d.patientId;
+              }
+              return o.clicked ? '#ff0000' : null;
+            })
+            .attr('stroke-width', 3);
+        }
+      )
+      .on('mouseover', (event, d: { patientId?: number; visitId?: number; dos?: number; clicked?: boolean; }) => {
+        const rect: d3.Selection<any, {}, any, any> = node.selectAll('rect');
+        rect
+          .attr('fill', (o: { patientId?: number; visitId?: number; dos?: number; clicked?: boolean; }) => {
+            return d.patientId === o.patientId ? 'yellow' : colScale(o.dos as number);
+          });
 
+        tooltip
+          .style('opacity', 1);
+      })
+      .on('mousemove', (event, d: { patientId?: number; visitId?: number; dos?: number; clicked?: boolean; }) => {
+        let v0 = -1;
+        let v1 = -1;
+        let v2 = -1;
+        this.graphData.forEach((value: { patientId?: number; visitId?: number; dos?: number; clicked?: boolean; }) => {
+          if (value.patientId === d.patientId) {
+            if (value.visitId === 0) v0 = value.dos as number;
+            if (value.visitId === 1) v1 = value.dos as number;
+            if (value.visitId === 2) v2 = value.dos as number;
+          }
+        });
+        tooltip
+          .html('visit 1: ' + (v0 === -1 ? '-/-' : v0) + '<br>' + 'visit 2: ' + (v1 === -1 ? '-/-' : v1)
+            + '<br>' + 'visit 3: ' + (v2 === -1 ? '-/-' : v2))
+          .style('left', (event.pageX + 20) + 'px')
+          .style('top', (event.pageY) + 'px');
+      })
+      .on('mouseout', (event, d: { patientId?: number; visitId?: number; dos?: number; clicked?: boolean; }) => {
+        const rect: d3.Selection<any, {}, any, any> = node.selectAll('rect');
+        rect
+          .attr('fill', (o: { patientId?: number; visitId?: number; dos?: number; clicked?: boolean; }) => {
+            return colScale(o.dos as number);
+          });
+        tooltip
+          .style('opacity', 0);
       })
       .attr('id', 'ego-node');
 
@@ -143,19 +210,6 @@ export class EgoGraphComponent implements OnInit {
     let j = 0;
 
     node.append('rect')
-      .on('mouseover', (d, i: { patientId?: number; visitId?: number; dos?: number; }) => {
-        // console.log(d, i);
-        // this.g
-        //   .append('text')
-        //   .style('font-size', '10px')
-        //   .attr('id', 'hoverText')
-        //   .attr('x', d.layerX)
-        //   .attr('y', d.layerY)
-        //   .text(i.dos + '');
-      })
-      .on('mouseout', (d: { patientId?: number; visitId?: number; dos?: number; }, i) => {
-        // d3.selectAll('#hoverText').remove();
-      })
       .attr('x', (d: { patientId?: number; visitId?: number; dos?: number; }, i, nodes) => {
         if (d.visitId !== currentVisit) {
           j = 0;
@@ -171,9 +225,6 @@ export class EgoGraphComponent implements OnInit {
       .attr('width', 30)
       .attr('height', 50)
       .attr('fill', (d: { patientId?: number; visitId?: number; dos?: number; }) => {
-        const colScale = d3.scaleLinear<string>()
-          .domain([0.80, 1])
-          .range(['#a5ee3c', '#097400']);
         return colScale(d.dos as number);
       });
 
@@ -242,7 +293,8 @@ export class EgoGraphComponent implements OnInit {
         data.push({
           patientId: value,
           visitId: visit,
-          dos: dosValue
+          dos: dosValue,
+          clicked: false
         });
       }
     }
