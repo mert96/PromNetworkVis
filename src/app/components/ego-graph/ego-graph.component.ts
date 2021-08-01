@@ -4,7 +4,6 @@ import {Patient} from '../../objects/patient';
 import {ClusterServiceService} from '../../services/cluster-service.service';
 import {EgoGraphService} from '../../services/ego-graph.service';
 import * as d3 from 'd3';
-import * as math from 'mathjs';
 import {DegreeOfSimilarityService} from '../../services/degree-of-similarity.service';
 
 @Component({
@@ -15,11 +14,12 @@ import {DegreeOfSimilarityService} from '../../services/degree-of-similarity.ser
 
 export class EgoGraphComponent implements OnInit {
 
-  isDropup = true;
-  dataAvailable = false;
+  isDropup = true; // patient selection window goes up if true
+  dataAvailable = false; // indicates whether data is loaded
   completedPatients: Patient[] = [];
   selectedPatient: Patient | null = null;
 
+  // contains the similar patient id's for every visit of the selected Patient
   private selectedPatientData!: Map<number, number[]>;
 
   width = 750;
@@ -44,9 +44,10 @@ export class EgoGraphComponent implements OnInit {
       .attr('y', 145)
       .text('Please read .csv file and press refresh');
 
+    // waits for patient data to be loaded and then manages the creation of the drop down selection
     this.clusterService.loadedData.subscribe((isLoaded: boolean) => {
       if (isLoaded) {
-        d3.selectAll('text')
+        d3.selectAll('text');
         d3.selectAll('#ego-group').remove();
         d3.selectAll('rect').remove();
         this.dataAvailable = true;
@@ -57,6 +58,9 @@ export class EgoGraphComponent implements OnInit {
 
   }
 
+  /**
+   * gets all completed patients
+   */
   getCompletedPatients(): void {
     this.completedPatients = [];
     this.patientData.patients.forEach(value => {
@@ -66,10 +70,19 @@ export class EgoGraphComponent implements OnInit {
     });
   }
 
+  /**
+   * sets selected patient to null
+   */
   resetSelectedPatient(): void {
     this.selectedPatient = null;
   }
 
+  /**
+   * gets called after user selects a patient from drop down menu
+   * calls the service to get all the similar patients per visit
+   * then proceeds to call the method for graph drawing
+   * @param p Patient object of selected patient
+   */
   setSelectedPatient(p: Patient): void {
     this.selectedPatient = p;
     this.selectedPatientData = this.egoGraphService.calculateSimilarPatients(p);
@@ -77,27 +90,9 @@ export class EgoGraphComponent implements OnInit {
     this.drawGraph();
   }
 
-  prepareData(): object[] {
-
-    const data = [];
-
-    for (const [visit, values] of this.selectedPatientData) {
-      for (const value of values) {
-
-        const p: Patient = this.selectedPatient as Patient;
-        const dosValue = this.dosService.getScore(p.patientId, value, visit);
-
-        data.push({
-          patientId: value,
-          visitId: visit,
-          dos: dosValue
-        });
-      }
-    }
-
-    return data;
-  }
-
+  /**
+   * draws graph after selecting a patient from dropdown list
+   */
   drawGraph(): void {
 
     d3.selectAll('#ego-group').remove();
@@ -182,6 +177,8 @@ export class EgoGraphComponent implements OnInit {
         return colScale(d.dos as number);
       });
 
+    j = 0;
+
     node.append('text')
       .style('font-size', '10px')
       .attr('x', (d: { patientId?: number; visitId?: number; dos?: number; }, i, nodes) => {
@@ -195,11 +192,12 @@ export class EgoGraphComponent implements OnInit {
       })
       .attr('y', (d: { patientId?: number; visitId?: number; dos?: number; }) => {
         return 60 + (60 * (d.visitId as number));
-        // TODO bug when ego graph only has nodes in one visit
       })
       .text((d: { patientId?: number; visitId?: number; dos?: number; }) => {
         return 'ID: ' + d.patientId;
       });
+
+    j = 0;
 
     node.append('text')
       .style('font-size', '10px')
@@ -214,7 +212,6 @@ export class EgoGraphComponent implements OnInit {
       })
       .attr('y', (d: { patientId?: number; visitId?: number; dos?: number; }) => {
         return 90 + (60 * (d.visitId as number));
-        // TODO bug when ego graph only has nodes in one visit
       })
       .text((d: { patientId?: number; visitId?: number; dos?: number; }) => {
         return '' + d.dos;
@@ -222,6 +219,35 @@ export class EgoGraphComponent implements OnInit {
 
     this.resetZoom();
 
+  }
+
+  /**
+   * prepares the data for graph drawing process in the form of:
+   *  patientId: value
+   *  visitId: visit
+   *  dos: dosValue
+   *
+   *  retrieves the DoS to the patient in the selectedPatientData list
+   */
+  prepareData(): object[] {
+
+    const data = [];
+
+    for (const [visit, values] of this.selectedPatientData) {
+      for (const value of values) {
+
+        const p: Patient = this.selectedPatient as Patient;
+        const dosValue = this.dosService.getScore(p.patientId, value, visit);
+
+        data.push({
+          patientId: value,
+          visitId: visit,
+          dos: dosValue
+        });
+      }
+    }
+
+    return data;
   }
 
 

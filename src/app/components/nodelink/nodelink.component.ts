@@ -293,7 +293,7 @@ export class NodelinkComponent implements OnInit {
         });
 
         this.links.transition().style('stroke-opacity', (o) => {
-          return (o.source === d || o.target === d) || !d.inFocus ? 1 : 0.05;
+          return (o.source === d || o.target === d) || !d.inFocus ? 1 : 0.02;
         });
 
       })
@@ -414,6 +414,11 @@ export class NodelinkComponent implements OnInit {
   }
 
   render(): void {
+
+    this.links.sort((a, b) => {
+      return !(a.target as Node).inFocus && !(a.source as Node).inFocus ? -1 : 1;
+    });
+
     // update coordinates when simulation changes
     this.links
       .attr('x1', (d: Link<Node>) => {
