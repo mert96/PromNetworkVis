@@ -1,6 +1,13 @@
 <div class="container">
   <div class="col">
     <div class="col form-control-sm">
+
+      <div>
+        <button type="button" class="btn btn-primary" (click)="lgModal.show()">open score table</button>
+      </div>
+
+      <hr class="solid">
+
       <div>
         <h3>SF-36</h3>
       </div>
@@ -139,14 +146,16 @@
       </div>
 
       <div class="form-group my-1">
-        <label for="4mRight"><input id="4mRight" type="checkbox" [checked]="this.patientData.activeCategories.get('LETTERS4MRIGHT')"
-                                  (change)="patientData.activeCategories.set('LETTERS4MRIGHT', !this.patientData.activeCategories.get('LETTERS4MRIGHT'))">
+        <label for="4mRight"><input id="4mRight" type="checkbox"
+                                    [checked]="this.patientData.activeCategories.get('LETTERS4MRIGHT')"
+                                    (change)="patientData.activeCategories.set('LETTERS4MRIGHT', !this.patientData.activeCategories.get('LETTERS4MRIGHT'))">
           4M right eye</label>
       </div>
 
       <div class="form-group my-1">
-        <label for="4mLeft"><input id="4mLeft" type="checkbox" [checked]="this.patientData.activeCategories.get('LETTERS4MLEFT')"
-                                  (change)="patientData.activeCategories.set('LETTERS4MLEFT', !this.patientData.activeCategories.get('LETTERS4MLEFT'))">
+        <label for="4mLeft"><input id="4mLeft" type="checkbox"
+                                   [checked]="this.patientData.activeCategories.get('LETTERS4MLEFT')"
+                                   (change)="patientData.activeCategories.set('LETTERS4MLEFT', !this.patientData.activeCategories.get('LETTERS4MLEFT'))">
           4M left eye</label>
       </div>
     </div>
@@ -168,3 +177,30 @@
     </div>
   </div>
 </div>
+
+<div bsModal #lgModal="bs-modal" class="modal fade" tabindex="-1"
+     role="dialog" aria-labelledby="dialog-sizes-name1">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 id="dialog-sizes-name1" class="modal-title pull-left">Score Table</h4>
+        <button type="button" class="close pull-right" (click)="lgModal.hide()" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body table-wrapper" #tableWrapper>
+        <ngx-datatable
+          id="table"
+          class="material"
+          style="height: calc(100%);"
+          [rows]="this.rows"
+          [columns]="this.columns"
+          columnMode="force"
+          [scrollbarV]="true"
+          [scrollbarH]="true"
+        ></ngx-datatable>
+      </div>
+    </div>
+  </div>
+</div>
+

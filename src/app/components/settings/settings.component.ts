@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {ChangeDetectorRef, Component, OnInit, TemplateRef, ViewChild} from '@angular/core';
 import {FormBuilder, FormGroup, Validators, FormsModule} from '@angular/forms';
 import {Visit} from '../../objects/visit';
 import {Score} from '../../objects/score';
@@ -7,7 +7,9 @@ import {DegreeOfSimilarityService} from '../../services/degree-of-similarity.ser
 import {PatientData} from '../../global/patientData';
 import {GlobalConstants} from '../../global/globalConstants';
 import {ClusterServiceService} from '../../services/cluster-service.service';
-import {EgoGraphService} from '../../services/ego-graph.service';
+import {BsModalRef, BsModalService} from 'ngx-bootstrap/modal';
+import * as d3 from 'd3';
+import {DatatableComponent} from '@swimlane/ngx-datatable';
 
 
 @Component({
@@ -17,6 +19,15 @@ import {EgoGraphService} from '../../services/ego-graph.service';
 })
 export class SettingsComponent implements OnInit {
 
+  @ViewChild('tableWrapper') tableWrapper: any;
+  @ViewChild(DatatableComponent) table!: DatatableComponent;
+  private currentComponentWidth: any;
+
+  modalRef!: BsModalRef;
+
+  rows!: object[];
+  columns!: object[];
+
   fileRead = false;
   firstRead = true;
 
@@ -25,7 +36,8 @@ export class SettingsComponent implements OnInit {
               public patientData: PatientData,
               private constants: GlobalConstants,
               private clusterService: ClusterServiceService,
-              private egoGraphService: EgoGraphService) {
+              private modalService: BsModalService,
+              private cdRef: ChangeDetectorRef) {
     /*
     sfVitality: [true, Validators.required],
     sfPhysicalFunctioning: [true, Validators.required],
@@ -50,7 +62,18 @@ export class SettingsComponent implements OnInit {
     */
   }
 
-  ngOnInit(): void {}
+  // withou this the when refreshing, the table does not show unless resizing website
+  ngAfterViewChecked() {
+    // Check if the table size has changed,
+    if (this.table && this.table.recalculate && (this.tableWrapper.nativeElement.clientWidth !== this.currentComponentWidth)) {
+      this.currentComponentWidth = this.tableWrapper.nativeElement.clientWidth;
+      this.table.recalculate();
+      this.cdRef.detectChanges();
+    }
+  }
+
+  ngOnInit(): void {
+  }
 
   /**
    * @return true if no category is selected, false if at least 1 category is selected
@@ -106,13 +129,49 @@ export class SettingsComponent implements OnInit {
     this.clusterService.initializeClustering();
     let countCompleted = 0;
     this.patientData.patients.forEach(value => {
-      if (value.completed){
+      if (value.completed) {
         countCompleted++;
       }
     });
     console.log('completed studies: ', countCompleted);
 
+    this.createTableEntries();
+
   }
+
+  createTableEntries(): void {
+    // reset current entries
+    const newRows: object[] = [];
+    const newColumns: object[] = [{prop: 'patient', width: 75}, {prop: 'visit', width: 75}];
+
+    // fill columns
+    this.patientData.activeCategories.forEach((value, key) => {
+      if (value) {
+        newColumns.push({prop: key, width: 75});
+      }
+    });
+
+    // fill rows
+    this.patientData.patients.forEach((p) => {
+      if (p.completed) {
+        p.visits.forEach((visit) => {
+          const row: object = {patient: p.patientId, visit: visit.patientVisitId};
+          for (const [key, value] of visit.scores.mapOfScores) {
+            if (this.patientData.activeCategories.get(key)) {
+              Object.defineProperty(row, `${key}`, {
+                value
+              });
+            }
+          }
+          newRows.push(row);
+        });
+      }
+    });
+
+    this.rows = [...newRows];
+    this.columns = [...newColumns];
+  }
+
 
   /**
    * transform each row in csv string into an object
@@ -183,7 +242,7 @@ export class SettingsComponent implements OnInit {
     const keys: string[] = Object.keys(input[0]);
     for (const currentEntry of input) {
       if ((currentEntry.USUBJID !== currentPatient
-        || currentEntry.VISITNUM !== currentVisit)
+          || currentEntry.VISITNUM !== currentVisit)
         && currentEntry.SITEID !== undefined) {
         currentPatient = currentEntry.USUBJID;
         currentVisit = currentEntry.VISITNUM;

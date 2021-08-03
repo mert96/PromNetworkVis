@@ -19,6 +19,7 @@
     "@angular/platform-browser": "~11.2.9",
     "@angular/platform-browser-dynamic": "~11.2.9",
     "@angular/router": "~11.2.9",
+    "@swimlane/ngx-datatable": "^19.0.0",
     "@types/mathjs": "^9.3.0",
     "d3": "^6.6.2",
     "mathjs": "^9.4.0",

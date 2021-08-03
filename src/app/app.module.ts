@@ -11,7 +11,9 @@ import {GlobalConstants} from './global/globalConstants';
 import {ClusterGraphComponent} from './components/cluster-graph/cluster-graph.component';
 import {EgoGraphComponent} from './components/ego-graph/ego-graph.component';
 import {BsDropdownModule} from 'ngx-bootstrap/dropdown';
+import {ModalModule} from 'ngx-bootstrap/modal';
 import { NodelinkComponent } from './components/nodelink/nodelink.component';
+import { NgxDatatableModule } from '@swimlane/ngx-datatable';
 
 @NgModule({
   declarations: [
@@ -28,6 +30,8 @@ import { NodelinkComponent } from './components/nodelink/nodelink.component';
     BsDropdownModule.forRoot(),
     BrowserAnimationsModule,
     FormsModule,
+    ModalModule.forRoot(),
+    NgxDatatableModule,
   ],
   providers: [PatientData, GlobalConstants],
   bootstrap: [AppComponent]
