@@ -191,13 +191,15 @@
       <div class="modal-body table-wrapper" #tableWrapper>
         <ngx-datatable
           id="table"
-          class="material"
+          class="bootstrap"
           style="height: calc(100%);"
           [rows]="this.rows"
           [columns]="this.columns"
           columnMode="force"
           [scrollbarV]="true"
           [scrollbarH]="true"
+          [headerHeight]="50"
+          [rowHeight]="50"
         ></ngx-datatable>
       </div>
     </div>

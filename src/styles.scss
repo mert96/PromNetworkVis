@@ -1,3 +1,23 @@
+@import '~@swimlane/ngx-datatable/index.css';
+@import '~@swimlane/ngx-datatable/themes/bootstrap.scss';
+@import '~@swimlane/ngx-datatable/themes/material.scss';
+@import '~@swimlane/ngx-datatable/themes/dark.scss';
+@import '~@swimlane/ngx-datatable/assets/icons.css';
+
+/* Preferably put any custom styles for ngx-datatable into your own "_datatable.scss" file
+   and @import it into global styles, but this is a simple working example */
+
+.ngx-datatable {
+  border: 1px solid #000000;
+}
+.datatable-body {
+  font-size: 20px;
+}
+.datatable-header{
+  font-size: 20px;
+}
+
+
 /* You can add global styles to this file, and also import other style files */
 app-root {
   display: block;

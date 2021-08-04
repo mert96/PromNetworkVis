@@ -383,7 +383,7 @@ export class NodelinkComponent implements OnInit {
     this.svgContainer.append('rect')
       .attr('x', 0)
       .attr('y', 0)
-      .attr('width', 150)
+      .attr('width', 160)
       .attr('height', 40)
       .attr('fill', 'yellow');
     this.svgContainer.append('text')

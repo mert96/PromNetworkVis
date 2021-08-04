@@ -1,5 +1,5 @@
-import {ChangeDetectorRef, Component, OnInit, TemplateRef, ViewChild} from '@angular/core';
-import {FormBuilder, FormGroup, Validators, FormsModule} from '@angular/forms';
+import {ChangeDetectorRef, Component, OnInit, ViewChild} from '@angular/core';
+import {FormBuilder} from '@angular/forms';
 import {Visit} from '../../objects/visit';
 import {Score} from '../../objects/score';
 import {Patient} from '../../objects/patient';
@@ -8,7 +8,6 @@ import {PatientData} from '../../global/patientData';
 import {GlobalConstants} from '../../global/globalConstants';
 import {ClusterServiceService} from '../../services/cluster-service.service';
 import {BsModalRef, BsModalService} from 'ngx-bootstrap/modal';
-import * as d3 from 'd3';
 import {DatatableComponent} from '@swimlane/ngx-datatable';
 
 
@@ -22,8 +21,6 @@ export class SettingsComponent implements OnInit {
   @ViewChild('tableWrapper') tableWrapper: any;
   @ViewChild(DatatableComponent) table!: DatatableComponent;
   private currentComponentWidth: any;
-
-  modalRef!: BsModalRef;
 
   rows!: object[];
   columns!: object[];
@@ -62,7 +59,7 @@ export class SettingsComponent implements OnInit {
     */
   }
 
-  // withou this the when refreshing, the table does not show unless resizing website
+  // without this when refreshing, the table does not show unless resizing website
   ngAfterViewChecked() {
     // Check if the table size has changed,
     if (this.table && this.table.recalculate && (this.tableWrapper.nativeElement.clientWidth !== this.currentComponentWidth)) {
@@ -142,12 +139,12 @@ export class SettingsComponent implements OnInit {
   createTableEntries(): void {
     // reset current entries
     const newRows: object[] = [];
-    const newColumns: object[] = [{prop: 'patient', width: 75}, {prop: 'visit', width: 75}];
+    const newColumns: object[] = [{prop: 'patient', width: 75/*, frozenLeft: true*/}, {prop: 'visit', width: 75/*, frozenLeft: true*/}];
 
     // fill columns
     this.patientData.activeCategories.forEach((value, key) => {
       if (value) {
-        newColumns.push({prop: key, width: 75});
+        newColumns.push({prop: key, width: key.length * 30});
       }
     });
 
