@@ -10,12 +10,31 @@
 .ngx-datatable {
   border: 1px solid #000000;
 }
-.datatable-body {
-  font-size: 20px;
+
+.ngx-datatable.material .datatable-body .datatable-body-row .datatable-body-cell {
+  font-size: 18px;
 }
-.datatable-header{
-  font-size: 20px;
+
+.ngx-datatable.material .datatable-header .datatable-header-cell {
+  font-size: 18px;
 }
+
+// for frozenLeft, so it has background when scrolling
+//.datatable-row-even {
+//  background-color: white !important;
+//}
+//.datatable-row-odd {
+//  background-color: #d9cfcf !important;
+//}
+//.datatable-header{
+//  background-color: white !important;
+//}
+//.ngx-datatable {
+//  .datatable-row-left {
+//    background-color: inherit;
+//    border: 1px solid black;
+//  }
+//}
 
 
 /* You can add global styles to this file, and also import other style files */
@@ -30,6 +49,7 @@ svg text {
   -ms-user-select: none;
   user-select: none;
 }
+
 svg text::selection {
   background: none;
 }

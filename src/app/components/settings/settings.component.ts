@@ -10,7 +10,6 @@ import {ClusterServiceService} from '../../services/cluster-service.service';
 import {BsModalRef, BsModalService} from 'ngx-bootstrap/modal';
 import {DatatableComponent} from '@swimlane/ngx-datatable';
 
-//TODO change color in ego graph to match colors in node link
 @Component({
   selector: 'app-settings',
   templateUrl: './settings.component.html',
@@ -139,7 +138,11 @@ export class SettingsComponent implements OnInit {
   createTableEntries(): void {
     // reset current entries
     const newRows: object[] = [];
-    const newColumns: object[] = [{prop: 'patient', width: 75/*, frozenLeft: true*/}, {prop: 'visit', width: 75/*, frozenLeft: true*/}];
+    const newColumns: object[] = [
+      {prop: 'patient', width: 90, frozenLeft: true},
+      {prop: 'visit', width: 75, frozenLeft: true},
+      {prop: 'treatment', width: 120, frozenLeft: true}
+    ];
 
     // fill columns
     this.patientData.activeCategories.forEach((value, key) => {
@@ -152,7 +155,7 @@ export class SettingsComponent implements OnInit {
     this.patientData.patients.forEach((p) => {
       if (p.completed) {
         p.visits.forEach((visit) => {
-          const row: object = {patient: p.patientId, visit: visit.patientVisitId};
+          const row: object = {patient: p.patientId, visit: visit.patientVisitId, treatment: p.treatment};
           for (const [key, value] of visit.scores.mapOfScores) {
             if (this.patientData.activeCategories.get(key)) {
               Object.defineProperty(row, `${key}`, {
