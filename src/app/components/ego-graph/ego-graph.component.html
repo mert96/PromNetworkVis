@@ -2,19 +2,51 @@
   <svg id="ego-svg" height="350" width="750" style="border: 2px solid #ccc">
   </svg>
   <div class="d-flex justify-content-between">
-    <div class="btn-group" dropdown [dropup]="isDropup">
-      <button id="button-dropup" dropdownToggle type="button" class="btn btn-primary dropdown-toggle"
-              aria-controls="dropdown-dropup">
-        {{selectedPatient === null ? 'Select Patient' : 'Patient ' + selectedPatient.patientId}} <span
-        class="caret"></span>
+    <div>
+      <div class="btn-group" dropdown [dropup]="isDropup">
+        <button id="button-dropup" dropdownToggle type="button" class="btn btn-primary dropdown-toggle"
+                aria-controls="dropdown-dropup">
+          {{selectedPatient === null ? 'Select Patient' : 'Patient ' + selectedPatient.patientId}} <span
+          class="caret"></span>
+        </button>
+        <ul id="dropdown-dropup" *dropdownMenu class="dropdown-menu scrollable-menu"
+            role="menu" aria-labelledby="button-dropup">
+          <li *ngFor="let patient of completedPatients">
+            <a class="dropdown-item" href="#" (click)="setSelectedPatient(patient)">Patient {{patient.patientId}}</a>
+          </li>
+        </ul>
+      </div>
+      <button style="margin-left: 2px" type="button" class="btn btn-primary " [disabled]="!selectedPatient" (click)="smModal.show()">show patient
+        information
       </button>
-      <ul id="dropdown-dropup" *dropdownMenu class="dropdown-menu scrollable-menu"
-          role="menu" aria-labelledby="button-dropup">
-        <li *ngFor="let patient of completedPatients">
-          <a class="dropdown-item" href="#" (click)="setSelectedPatient(patient)">Patient {{patient.patientId}}</a>
-        </li>
-      </ul>
     </div>
     <button class="btn btn-success pull-right" type="button" (click)="this.resetZoom()">Reset Zoom</button>
+  </div>
+</div>
+
+<div bsModal #smModal="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="dialog-sizes-name2">
+  <div class="modal-dialog modal-sm">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 id="dialog-sizes-name2" class="modal-title pull-left">
+          Patient {{selectedPatient?.patientId !== null ? selectedPatient?.patientId : -1}}</h4>
+        <button type="button" class="close pull-right" aria-label="Close" (click)="smModal.hide()">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        Country: {{selectedPatient?.country}} <br>
+        Region: {{selectedPatient?.region}}<br>
+        Age: {{selectedPatient?.age}}<br>
+        Sex: {{selectedPatient?.sex}}<br>
+        Race: {{selectedPatient?.race}}<br>
+        Ethnicity: {{selectedPatient?.ethnic}}<br>
+        <br>
+        Study completed? {{selectedPatient?.completed ? 'Yes' : 'No'}}<br>
+        <br>
+        Tested eye: {{selectedPatient?.testedEye}}<br>
+        Treatment: {{selectedPatient?.treatment}}<br>
+      </div>
+    </div>
   </div>
 </div>
