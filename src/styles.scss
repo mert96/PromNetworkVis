@@ -24,6 +24,16 @@ app-root {
   height: 100%;
 }
 
+svg text {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+svg text::selection {
+  background: none;
+}
+
 //body {
 //  background-color: black !important;
 //}

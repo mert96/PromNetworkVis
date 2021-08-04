@@ -235,15 +235,15 @@ export class NodelinkComponent implements OnInit {
       maxScore = link.score > maxScore ? link.score : maxScore;
     }
 
-    if (minScore === 1 && maxScore === 1) {
+    if (minScore ===  maxScore) {
       return d3.scaleLinear<string>()
         .domain([minScore, maxScore])
-        .range(['#097400', '#097400']);
+        .range(['#17299d', '#17299d']);
     }
 
     return d3.scaleLinear<string>()
       .domain([minScore, maxScore])
-      .range(['#ee1100', '#097400']);
+      .range(['#880000', '#097400']);
   }
 
   /**

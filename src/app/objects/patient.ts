@@ -3,10 +3,10 @@ import {Visit} from './visit';
 
 export class Patient {
   constructor(
-    public patientId: number,
+    public patientId: number, //not include
     public country: string,
     public region: string,
-    public birthday: string,
+    public birthday: string, //not include
     public age: number,
     public sex: string,
     public race: string,
@@ -14,7 +14,7 @@ export class Patient {
     public completed: boolean,
     public testedEye: string,
     public treatment: string,
-    public visits: Visit[]
+    public visits: Visit[] //not include
   ) {
   }
 }

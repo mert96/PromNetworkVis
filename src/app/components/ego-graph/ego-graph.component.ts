@@ -99,6 +99,26 @@ export class EgoGraphComponent implements OnInit {
    */
   drawGraph(): void {
 
+    this.graphData = this.prepareData();
+
+    let minDoS = 1;
+    let maxDoS = 0;
+
+    // color scale creation
+    this.graphData.forEach((d: { patientId?: number; visitId?: number; dos?: number; clicked?: boolean; }) => {
+      const score = d.dos as number;
+      minDoS = score < minDoS ? score : minDoS;
+      maxDoS = score > maxDoS ? score : maxDoS;
+    });
+    let colScale = d3.scaleLinear<string>()
+      .domain([minDoS, maxDoS])
+      .range(['#880000', '#097400']);
+    if (minDoS === maxDoS) {
+      colScale = d3.scaleLinear<string>()
+        .domain([minDoS, maxDoS])
+        .range(['#17299d', '#17299d']);
+    }
+
     // create a tooltip
     const tooltip = d3.select('#master')
       .append('div')
@@ -111,7 +131,7 @@ export class EgoGraphComponent implements OnInit {
       .style('padding', '5px');
 
     d3.selectAll('#ego-group').remove();
-    d3.selectAll('rect').remove();
+    // d3.selectAll('rect').remove();
 
     this.zoom = d3.zoom()
       .scaleExtent([0.1, 10])
@@ -130,6 +150,11 @@ export class EgoGraphComponent implements OnInit {
     this.g.append('text')
       .style('font-size', '10px')
       .attr('x', 30)
+      .attr('y', 30)
+      .text('(red) min. DoS: ' + minDoS + ' | (green) max. DoS: ' + maxDoS);
+    this.g.append('text')
+      .style('font-size', '10px')
+      .attr('x', 30)
       .attr('y', 60 + 60 * 0)
       .text('Visit 1');
     this.g.append('text')
@@ -142,12 +167,6 @@ export class EgoGraphComponent implements OnInit {
       .attr('x', 30)
       .attr('y', 60 + 60 * 2)
       .text('Visit 3');
-
-    this.graphData = this.prepareData();
-
-    const colScale = d3.scaleLinear<string>()
-      .domain([0.80, 1])
-      .range(['#a5ee3c', '#097400']);
 
     const node = this.g
       .selectAll('g')
@@ -170,9 +189,14 @@ export class EgoGraphComponent implements OnInit {
       )
       .on('mouseover', (event, d: { patientId?: number; visitId?: number; dos?: number; clicked?: boolean; }) => {
         const rect: d3.Selection<any, {}, any, any> = node.selectAll('rect');
+        const text: d3.Selection<any, {}, any, any> = node.selectAll('text');
         rect
           .attr('fill', (o: { patientId?: number; visitId?: number; dos?: number; clicked?: boolean; }) => {
             return d.patientId === o.patientId ? 'yellow' : colScale(o.dos as number);
+          });
+        text
+          .attr('fill', (o: { patientId?: number; visitId?: number; dos?: number; clicked?: boolean; }) => {
+            return d.patientId === o.patientId ? 'black' : 'white';
           });
 
         tooltip
@@ -197,10 +221,13 @@ export class EgoGraphComponent implements OnInit {
       })
       .on('mouseout', (event, d: { patientId?: number; visitId?: number; dos?: number; clicked?: boolean; }) => {
         const rect: d3.Selection<any, {}, any, any> = node.selectAll('rect');
+        const text: d3.Selection<any, {}, any, any> = node.selectAll('text');
         rect
           .attr('fill', (o: { patientId?: number; visitId?: number; dos?: number; clicked?: boolean; }) => {
             return colScale(o.dos as number);
           });
+        text
+          .attr('fill', 'white');
         tooltip
           .style('opacity', 0);
       })
@@ -222,7 +249,7 @@ export class EgoGraphComponent implements OnInit {
       .attr('y', (d: { patientId?: number; visitId?: number; dos?: number; }) => {
         return 50 + 60 * (d.visitId as number);
       })
-      .attr('width', 30)
+      .attr('width', 35)
       .attr('height', 50)
       .attr('fill', (d: { patientId?: number; visitId?: number; dos?: number; }) => {
         return colScale(d.dos as number);
@@ -232,6 +259,7 @@ export class EgoGraphComponent implements OnInit {
 
     node.append('text')
       .style('font-size', '10px')
+      .attr('fill', 'white')
       .attr('x', (d: { patientId?: number; visitId?: number; dos?: number; }, i, nodes) => {
         if (d.visitId !== currentVisit) {
           j = 0;
@@ -252,6 +280,7 @@ export class EgoGraphComponent implements OnInit {
 
     node.append('text')
       .style('font-size', '10px')
+      .attr('fill', 'white')
       .attr('x', (d: { patientId?: number; visitId?: number; dos?: number; }, i, nodes) => {
         if (d.visitId !== currentVisit) {
           j = 0;

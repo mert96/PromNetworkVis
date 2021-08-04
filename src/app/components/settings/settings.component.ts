@@ -10,7 +10,7 @@ import {ClusterServiceService} from '../../services/cluster-service.service';
 import {BsModalRef, BsModalService} from 'ngx-bootstrap/modal';
 import {DatatableComponent} from '@swimlane/ngx-datatable';
 
-
+//TODO change color in ego graph to match colors in node link
 @Component({
   selector: 'app-settings',
   templateUrl: './settings.component.html',
