@@ -214,8 +214,12 @@ export class EgoGraphComponent implements OnInit {
           }
         });
         tooltip
-          .html('visit 1: ' + (v0 === -1 ? '-/-' : v0) + '<br>' + 'visit 2: ' + (v1 === -1 ? '-/-' : v1)
-            + '<br>' + 'visit 3: ' + (v2 === -1 ? '-/-' : v2))
+          .html('visit 1: ' + (v0 === -1 ? '-/-' : v0)
+            + '<br>' + 'visit 2: ' + (v1 === -1 ? '-/-' : v1)
+            + '<br>' + 'visit 3: ' + (v2 === -1 ? '-/-' : v2)
+            + '<br>' + 'treatment: ' + this.patientData.patients.find((p) => {
+              return p.patientId === d.patientId;
+            })?.treatment)
           .style('left', (event.pageX + 20) + 'px')
           .style('top', (event.pageY) + 'px');
       })
