@@ -6,7 +6,7 @@
   <div class="d-flex justify-content-between">
     <button class="btn btn-primary pull-left" type="button" [disabled]="this.currentVisit === 0" (click)="this.previousVisit()">previous visit</button>
     <p>current Visit: {{currentVisit + 1}}</p>
-    <button class="btn btn-success pull-right" type="button" (click)="this.resetZoom()">Reset Zoom</button>
+    <button class="btn btn-success pull-right" type="button" [disabled]="!dataAvailable" (click)="this.resetZoom()">Reset Zoom</button>
     <button class="btn btn-primary pull-right" type="button" [disabled]="this.currentVisit === 2"  (click)="this.nextVisit()">next visit</button>
   </div>
 </div>

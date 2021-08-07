@@ -135,6 +135,9 @@ export class SettingsComponent implements OnInit {
 
   }
 
+  /**
+   * creates the rows and columns for the score table
+   */
   createTableEntries(): void {
     // reset current entries
     const newRows: object[] = [];

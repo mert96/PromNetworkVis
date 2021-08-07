@@ -18,7 +18,7 @@ export class EgoGraphComponent implements OnInit {
 
   isDropup = true; // patient selection window goes up if true
   dataAvailable = false; // indicates whether data is loaded
-  completedPatients: Patient[] = [];
+  completedPatients: Patient[] = []; // list of completed patients
   selectedPatient: Patient | null = null;
 
   // contains the similar patient id's for every visit of the selected Patient
@@ -307,10 +307,11 @@ export class EgoGraphComponent implements OnInit {
 
   /**
    * prepares the data for graph drawing process in the form of:
-   *  patientId: value
-   *  visitId: visit
-   *  dos: dosValue
-   *
+   *  {
+   *    patientId: value
+   *    visitId: visit
+   *    dos: dosValue
+   *  }
    *  retrieves the DoS to the patient in the selectedPatientData list
    */
   prepareData(): object[] {

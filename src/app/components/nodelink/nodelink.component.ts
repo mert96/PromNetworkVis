@@ -13,6 +13,8 @@ import {DegreeOfSimilarityService} from '../../services/degree-of-similarity.ser
 
 export class NodelinkComponent implements OnInit {
 
+  dataLoaded = false;
+
   private graph!: Graph; // Graph = { nodes: Array<Node>; links: Array<Link> }
 
   private svgContainer!: d3.Selection<SVGElement, {}, HTMLElement, any>;
@@ -30,7 +32,7 @@ export class NodelinkComponent implements OnInit {
   private width = 600;
   private height = 400;
 
-  private selectedPatients: number[] = [];
+  private selectedPatients: number[] = []; // Patient IDs from selected CLuster
 
   private NODE_RADIUS = 15;
 
@@ -51,9 +53,11 @@ export class NodelinkComponent implements OnInit {
     this.clusterService.selectedCluster.subscribe((clicked: number[]) => {
       if (clicked.length !== 0 && !this.equals(clicked, this.selectedPatients)) {
         this.selectedPatients = clicked;
+        this.dataLoaded = true;
         // console.log(Date.now(), this.selectedPatients);
         this.initializeNodeLink();
       } else if (clicked.length === 0) {
+        this.dataLoaded = false;
         this.clearSVG();
       }
     });
@@ -85,7 +89,7 @@ export class NodelinkComponent implements OnInit {
   }
 
   /**
-   * create a graph (graph with list of nodes and links) from the passed patients
+   * create a graph (graph with list of nodes and links) from the selected patient data
    */
   loadDataToGraph(): void {
     this.graph = new Graph();

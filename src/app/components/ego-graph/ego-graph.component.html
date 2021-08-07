@@ -20,7 +20,7 @@
         information
       </button>
     </div>
-    <button class="btn btn-success pull-right" type="button" (click)="this.resetZoom()">Reset Zoom</button>
+    <button class="btn btn-success pull-right" type="button" [disabled]="!selectedPatient" (click)="this.resetZoom()">Reset Zoom</button>
   </div>
 </div>
 
