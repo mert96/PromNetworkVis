@@ -4,7 +4,6 @@ import {GlobalConstants} from '../global/globalConstants';
 import * as math from 'mathjs';
 import {Matrix} from 'mathjs';
 import {BehaviorSubject} from 'rxjs';
-import {valueReferenceToExpression} from '@angular/compiler-cli/src/ngtsc/annotations/src/util';
 
 @Injectable({
   providedIn: 'root'
@@ -63,9 +62,11 @@ export class ClusterServiceService {
 
     this.visits = [];
 
-    for (let i = 0; i < this.constants.maxNumberOfVisits; i++) {
+    for (let i = 0; i < this.constants.maxNumOfVisits; i++) {
       this.convertMapToMatrix(i);
-      this.startMarkovClustering(i);
+      if (this.visits[i]) {
+        this.startMarkovClustering(i);
+      }
     }
 
     this.setLoadedData(true);
@@ -82,10 +83,12 @@ export class ClusterServiceService {
    * @param visit: id which corresponds to the visit id
    */
   private convertMapToMatrix(visit: number): void {
+    let matrixFilled = false;
     let adjMatrix: Matrix = math.matrix('sparse');
     const dosMap = this.dos.getDoS();
     for (const [key, value] of dosMap) {
       if (key.includes('V' + (visit + 1))) {
+        matrixFilled = true;
         const indices = this.dos.getIndices(key);
         // console.log(key, ' -> ' + `${indices}` + ' : ' + value);
         if (value >= 0.90) {
@@ -94,9 +97,11 @@ export class ClusterServiceService {
         }
       }
     }
-    adjMatrix = this.addLoops(adjMatrix);
-    adjMatrix = this.normalize(adjMatrix);
-    this.visits.push(adjMatrix);
+    if (matrixFilled) {
+      adjMatrix = this.addLoops(adjMatrix);
+      adjMatrix = this.normalize(adjMatrix);
+      this.visits.push(adjMatrix);
+    }
     // console.log('visits :' + visit + ' ', adjMatrix);
   }
 
@@ -152,7 +157,6 @@ export class ClusterServiceService {
       const I = math.clone(this.visits[visit]);
 
       if (this.finished(E, I) || i === this.maxLoops - 1) {
-        console.log(i);
         this.clusterMap.set(visit, this.extractClusters(this.visits[visit]));
         break;
       }

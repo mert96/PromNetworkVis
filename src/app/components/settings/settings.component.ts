@@ -231,6 +231,7 @@ export class SettingsComponent implements OnInit {
     this.patientData.patients = [];
     this.dosService.resetDoS();
     this.clusterService.visits = [];
+    this.clusterService.clusterMap = new Map<number, number[][]>();
     this.clusterService.setLoadedData(false);
   }
 

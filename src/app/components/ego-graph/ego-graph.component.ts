@@ -90,7 +90,6 @@ export class EgoGraphComponent implements OnInit {
   setSelectedPatient(p: Patient): void {
     this.selectedPatient = p;
     this.selectedPatientData = this.egoGraphService.calculateSimilarPatients(p);
-    console.log(this.selectedPatientData);
     this.drawGraph();
   }
 
@@ -167,6 +166,11 @@ export class EgoGraphComponent implements OnInit {
       .attr('x', 30)
       .attr('y', 60 + 60 * 2)
       .text('Visit 3');
+    this.g.append('text')
+      .style('font-size', '10px')
+      .attr('x', 30)
+      .attr('y', 60 + 60 * 3)
+      .text('Visit 4');
 
     const node = this.g
       .selectAll('g')
@@ -206,17 +210,20 @@ export class EgoGraphComponent implements OnInit {
         let v0 = -1;
         let v1 = -1;
         let v2 = -1;
+        let v3 = -1;
         this.graphData.forEach((value: { patientId?: number; visitId?: number; dos?: number; clicked?: boolean; }) => {
           if (value.patientId === d.patientId) {
             if (value.visitId === 0) v0 = value.dos as number;
             if (value.visitId === 1) v1 = value.dos as number;
             if (value.visitId === 2) v2 = value.dos as number;
+            if (value.visitId === 3) v3 = value.dos as number;
           }
         });
         tooltip
           .html('visit 1: ' + (v0 === -1 ? '-/-' : v0)
             + '<br>' + 'visit 2: ' + (v1 === -1 ? '-/-' : v1)
             + '<br>' + 'visit 3: ' + (v2 === -1 ? '-/-' : v2)
+            + '<br>' + 'visit 4: ' + (v3 === -1 ? '-/-' : v3)
             + '<br>' + 'treatment: ' + this.patientData.patients.find((p) => {
               return p.patientId === d.patientId;
             })?.treatment)

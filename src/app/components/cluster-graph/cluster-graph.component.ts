@@ -1,6 +1,7 @@
 import {Component, OnInit} from '@angular/core';
 import * as d3 from 'd3';
 import {ClusterServiceService} from '../../services/cluster-service.service';
+import {GlobalConstants} from '../../global/globalConstants';
 
 @Component({
   selector: 'app-cluster-graph',
@@ -12,6 +13,8 @@ export class ClusterGraphComponent implements OnInit {
   dataAvailable = false;
   currentVisit = 0;
 
+  maxVisitNum = this.constants.maxNumOfVisits;
+
   private width = 750;
   private height = 400;
 
@@ -20,7 +23,8 @@ export class ClusterGraphComponent implements OnInit {
 
   private zoom!: d3.ZoomBehavior<any, unknown>;
 
-  constructor(private clusterService: ClusterServiceService) {
+  constructor(private clusterService: ClusterServiceService,
+              private constants: GlobalConstants) {
   }
 
   ngOnInit(): void {
@@ -46,7 +50,7 @@ export class ClusterGraphComponent implements OnInit {
    * switches to next visit by redrawing
    */
   nextVisit(): void {
-    if (this.dataAvailable && this.currentVisit < 2) {
+    if (this.dataAvailable && this.currentVisit < this.constants.maxNumOfVisits) {
       this.currentVisit++;
       this.clusterService.setCurrentClusterGraphVisit(this.currentVisit);
       this.initializeVisualization();
@@ -74,6 +78,10 @@ export class ClusterGraphComponent implements OnInit {
     const clusterMap: Map<number, number[][]> = this.clusterService.getClusters();
 
     const visitCluster = clusterMap.get(this.currentVisit);
+
+    if (visitCluster === undefined){
+      return;
+    }
 
     let maxRad = 0;
     let minRad = 1000000000000;
