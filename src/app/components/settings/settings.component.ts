@@ -207,7 +207,7 @@ export class SettingsComponent implements OnInit {
    */
   readCsv(fileInput: any): void {
     this.fileRead = true;
-    // this.resetPatientData();
+    this.resetPatientData();
     const fileRead = fileInput.target.files[0];
     const reader: FileReader = new FileReader();
     reader.readAsText(fileRead);

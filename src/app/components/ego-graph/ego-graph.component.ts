@@ -330,6 +330,7 @@ export class EgoGraphComponent implements OnInit {
           dos: dosValue,
           clicked: false
         });
+
       }
     }
 

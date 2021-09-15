@@ -9,10 +9,6 @@ import * as d3 from 'd3';
 })
 export class DegreeOfSimilarityService {
 
-  // TODO make differencesin DoS higher through a exponential function f.e. e^(10x). Higher differences in DoS should to
-  // TODO more clusters and more informative clusters. The function has a range of 1 to 22026
-  // TODO Key points: 0,75 = 1808; 0.85 = 4914; 0.95 = 13359
-
   private dosMap: Map<string, number> = new Map<string, number>();
 
   constructor(private patientData: PatientData,
@@ -50,12 +46,6 @@ export class DegreeOfSimilarityService {
     console.log(this.dosMap);
 
   }
-
-  /*
-  TODO what if category is selected but one of the patients did not complete the correspondig questionaire?
-  TODO currently the whole visit is ignored, but i need to implement a choice which the user can take to just ignore the questionaire
-  TODO which only 1 patient has and instead use the one both have, for example a chckbox in the settings ("strict calculation")
-  */
 
   /**
    * contain the algorithm for the calculation of the Degree of Similarty value between 2 patients

@@ -111,7 +111,9 @@ export class NodelinkComponent implements OnInit {
         link.target = nodes[j];
         link.score = this.dosService
           .getScore(nodes[i].id as number, nodes[j].id as number, this.clusterService.getCurrentClusterGraphVisit());
+        // if (link.score >= 0.9) { -- uncomment if node-link view should only display edges with score >= 0.9
         links.push(link);
+        // }
       }
     }
     this.graph.nodes = nodes;
@@ -224,6 +226,12 @@ export class NodelinkComponent implements OnInit {
 
     // start simulation and set target (=when does the simulation converge)
     this.simulation.alphaTarget(0).restart();
+
+    this.clusterService.selectedCluster.subscribe((clicked: number[]) => {
+      if (clicked.length === 0) {
+        this.simulation.stop();
+      }
+    });
   }
 
   /**
@@ -239,7 +247,7 @@ export class NodelinkComponent implements OnInit {
       maxScore = link.score > maxScore ? link.score : maxScore;
     }
 
-    if (minScore ===  maxScore) {
+    if (minScore === maxScore) {
       return d3.scaleLinear<string>()
         .domain([minScore, maxScore])
         .range(['#17299d', '#17299d']);
@@ -410,7 +418,7 @@ export class NodelinkComponent implements OnInit {
   noFocusedNode(): boolean {
     let focusedNodesExist = false;
     this.graph.nodes!.forEach((n) => {
-      if (n.inFocus){
+      if (n.inFocus) {
         focusedNodesExist = true;
       }
     });
