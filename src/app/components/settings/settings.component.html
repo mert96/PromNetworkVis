@@ -1,0 +1,208 @@
+<div class="container">
+  <div class="col">
+    <div class="col form-control-sm">
+
+      <div>
+        <button type="button" class="btn btn-primary" (click)="lgModal.show()">open score table</button>
+      </div>
+
+      <hr class="solid">
+
+      <div>
+        <h3>SF-36</h3>
+      </div>
+
+      <div class="form-group my-1">
+        <button class="btn btn-primary mx-1" type="button" (click)="this.toggleAll('sf')">toggle all</button>
+      </div>
+
+      <div class="form-group my-1">
+        <label for="sf1"><input id="sf1" type="checkbox" [checked]="this.patientData.activeCategories.get('QSVT')"
+                                (change)="patientData.activeCategories.set('QSVT', !this.patientData.activeCategories.get('QSVT'))">
+          vitality</label>
+      </div>
+
+      <div class="form-group my-1">
+        <label for="sf2"><input id="sf2" type="checkbox" [checked]="this.patientData.activeCategories.get('QSPF')"
+                                (change)="patientData.activeCategories.set('QSPF', !this.patientData.activeCategories.get('QSPF'))">
+          physical functioning</label>
+      </div>
+
+      <div class="form-group my-1">
+        <label for="sf3"><input id="sf3" type="checkbox" [checked]="this.patientData.activeCategories.get('QSBP')"
+                                (change)="patientData.activeCategories.set('QSBP', !this.patientData.activeCategories.get('QSBP'))">
+          bodily pain</label>
+      </div>
+
+      <div class="form-group my-1">
+        <label for="sf4"><input id="sf4" type="checkbox" [checked]="this.patientData.activeCategories.get('QSGP')"
+                                (change)="patientData.activeCategories.set('QSGP', !this.patientData.activeCategories.get('QSGP'))">
+          general health perceptions</label>
+      </div>
+
+      <div class="form-group my-1">
+        <label for="sf5"><input id="sf5" type="checkbox" [checked]="this.patientData.activeCategories.get('QSRP')"
+                                (change)="patientData.activeCategories.set('QSRP', !this.patientData.activeCategories.get('QSRP'))">
+          physical role functioning</label>
+      </div>
+
+      <div class="form-group my-1">
+        <label for="sf6"><input id="sf6" type="checkbox" [checked]="this.patientData.activeCategories.get('QSSO')"
+                                (change)="patientData.activeCategories.set('QSSO', !this.patientData.activeCategories.get('QSSO'))">
+          social role functioning</label>
+      </div>
+
+      <div class="form-group my-1">
+        <label for="sf7"><input id="sf7" type="checkbox" [checked]="this.patientData.activeCategories.get('QSRE')"
+                                (change)="patientData.activeCategories.set('QSRE', !this.patientData.activeCategories.get('QSRE'))">
+          emotional role functioning</label>
+      </div>
+
+      <div class="form-group my-1">
+        <label for="sf8"><input id="sf8" type="checkbox" [checked]="this.patientData.activeCategories.get('QSME')"
+                                (change)="patientData.activeCategories.set('QSME', !this.patientData.activeCategories.get('QSME'))">
+          mental health</label>
+      </div>
+    </div>
+    <div class="col form-control-sm">
+      <div>
+        <h3>VFQ-25</h3>
+      </div>
+
+      <div class="form-group my-1">
+        <button class="btn btn-primary mx-1" type="button" (click)="this.toggleAll('vfq')">toggle all</button>
+      </div>
+
+      <div class="form-group my-1">
+        <label for="vfq1"><input id="vfq1" type="checkbox" [checked]="this.patientData.activeCategories.get('QSBGH')"
+                                 (change)="patientData.activeCategories.set('QSBGH', !this.patientData.activeCategories.get('QSBGH'))">
+          general health</label>
+      </div>
+
+      <div class="form-group my-1">
+        <label for="vfq2"><input id="vfq2" type="checkbox" [checked]="this.patientData.activeCategories.get('QSBGV')"
+                                 (change)="patientData.activeCategories.set('QSBGV', !this.patientData.activeCategories.get('QSBGV'))">
+          general vision</label>
+      </div>
+
+      <div class="form-group my-1">
+        <label for="vfq3"><input id="vfq3" type="checkbox" [checked]="this.patientData.activeCategories.get('QSOP')"
+                                 (change)="patientData.activeCategories.set('QSOP', !this.patientData.activeCategories.get('QSOP'))">
+          ocular pain</label>
+      </div>
+
+      <div class="form-group my-1">
+        <label for="vfq4"><input id="vfq4" type="checkbox" [checked]="this.patientData.activeCategories.get('QSNA')"
+                                 (change)="patientData.activeCategories.set('QSNA', !this.patientData.activeCategories.get('QSNA'))">
+          near activities</label>
+      </div>
+
+      <div class="form-group my-1">
+        <label for="vfq5"><input id="vfq5" type="checkbox" [checked]="this.patientData.activeCategories.get('QSDA')"
+                                 (change)="patientData.activeCategories.set('QSDA', !this.patientData.activeCategories.get('QSDA'))">
+          distance activities</label>
+      </div>
+
+      <div class="form-group my-1">
+        <label for="vfq6"><input id="vfq6" type="checkbox" [checked]="this.patientData.activeCategories.get('QSSF')"
+                                 (change)="patientData.activeCategories.set('QSSF', !this.patientData.activeCategories.get('QSSF'))">
+          social functioning</label>
+      </div>
+
+      <div class="form-group my-1">
+        <label for="vfq7"><input id="vfq7" type="checkbox" [checked]="this.patientData.activeCategories.get('QSMH')"
+                                 (change)="patientData.activeCategories.set('QSMH', !this.patientData.activeCategories.get('QSMH'))">
+          mental health</label>
+      </div>
+
+      <div class="form-group my-1">
+        <label for="vfq8"><input id="vfq8" type="checkbox" [checked]="this.patientData.activeCategories.get('QSRD')"
+                                 (change)="patientData.activeCategories.set('QSRD', !this.patientData.activeCategories.get('QSRD'))">
+          role difficulties</label>
+      </div>
+
+      <div class="form-group my-1">
+        <label for="vfq9"><input id="vfq9" type="checkbox" [checked]="this.patientData.activeCategories.get('QSDP')"
+                                 (change)="patientData.activeCategories.set('QSDP', !this.patientData.activeCategories.get('QSDP'))">
+          dependency</label>
+      </div>
+
+      <div class="form-group my-1">
+        <label for="vfq10"><input id="vfq10" type="checkbox" [checked]="this.patientData.activeCategories.get('QSDV')"
+                                  (change)="patientData.activeCategories.set('QSDV', !this.patientData.activeCategories.get('QSDV'))">
+          driving</label>
+      </div>
+
+      <div class="form-group my-1">
+        <label for="vfq11"><input id="vfq11" type="checkbox" [checked]="this.patientData.activeCategories.get('QSCV')"
+                                  (change)="patientData.activeCategories.set('QSCV', !this.patientData.activeCategories.get('QSCV'))">
+          color vision</label>
+      </div>
+
+      <div class="form-group my-1">
+        <label for="vfq12"><input id="vfq12" type="checkbox" [checked]="this.patientData.activeCategories.get('QSPV')"
+                                  (change)="patientData.activeCategories.set('QSPV', !this.patientData.activeCategories.get('QSPV'))">
+          peripheral vision</label>
+      </div>
+
+      <div class="form-group my-1">
+        <label for="4mRight"><input id="4mRight" type="checkbox"
+                                    [checked]="this.patientData.activeCategories.get('LETTERS4MRIGHT')"
+                                    (change)="patientData.activeCategories.set('LETTERS4MRIGHT', !this.patientData.activeCategories.get('LETTERS4MRIGHT'))">
+          4M right eye</label>
+      </div>
+
+      <div class="form-group my-1">
+        <label for="4mLeft"><input id="4mLeft" type="checkbox"
+                                   [checked]="this.patientData.activeCategories.get('LETTERS4MLEFT')"
+                                   (change)="patientData.activeCategories.set('LETTERS4MLEFT', !this.patientData.activeCategories.get('LETTERS4MLEFT'))">
+          4M left eye</label>
+      </div>
+    </div>
+
+    <div class="d-flex justify-content-between">
+      <div class="modal-footer">
+        <button (click)="refreshCategories()" [disabled]="this.noCatSelected() || !this.fileRead"
+                class="btn btn-success pull-left" type="button">Refresh
+        </button>
+      </div>
+    </div>
+
+    <div class="col">
+      <label class="row" for="file">
+        choose patient file (*.csv)
+      </label>
+      <input class="row" id="file" type="file" accept=".csv" (change)="readCsv($event)">
+
+    </div>
+  </div>
+</div>
+
+<div bsModal #lgModal="bs-modal" class="modal fade" tabindex="-1"
+     role="dialog" aria-labelledby="dialog-sizes-name1">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 id="dialog-sizes-name1" class="modal-title pull-left">Score Table</h4>
+        <button type="button" class="close pull-right" (click)="lgModal.hide()" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body table-wrapper" #tableWrapper>
+        <ngx-datatable
+          id="table"
+          class="material"
+          style="height: calc(100%);"
+          [rows]="this.rows"
+          [columns]="this.columns"
+          columnMode="force"
+          [scrollbarV]="true"
+          [scrollbarH]="true"
+          [headerHeight]="50"
+          [rowHeight]="50"
+        ></ngx-datatable>
+      </div>
+    </div>
+  </div>
+</div>
+

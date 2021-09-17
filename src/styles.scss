@@ -1,1 +1,59 @@
+@import '~@swimlane/ngx-datatable/index.css';
+@import '~@swimlane/ngx-datatable/themes/bootstrap.scss';
+@import '~@swimlane/ngx-datatable/themes/material.scss';
+@import '~@swimlane/ngx-datatable/themes/dark.scss';
+@import '~@swimlane/ngx-datatable/assets/icons.css';
+
+/* Preferably put any custom styles for ngx-datatable into your own "_datatable.scss" file
+   and @import it into global styles, but this is a simple working example */
+
+.ngx-datatable {
+  border: 1px solid #000000;
+}
+
+.ngx-datatable.material .datatable-body .datatable-body-row .datatable-body-cell {
+  font-size: 18px;
+}
+
+.ngx-datatable.material .datatable-header .datatable-header-cell {
+  font-size: 18px;
+}
+
+// for frozenLeft, so it has background when scrolling
+//.datatable-row-even {
+//  background-color: white !important;
+//}
+//.datatable-row-odd {
+//  background-color: #d9cfcf !important;
+//}
+//.datatable-header{
+//  background-color: white !important;
+//}
+//.ngx-datatable {
+//  .datatable-row-left {
+//    background-color: inherit;
+//    border: 1px solid black;
+//  }
+//}
+
+
 /* You can add global styles to this file, and also import other style files */
+app-root {
+  display: block;
+  height: 100%;
+}
+
+svg text {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+svg text::selection {
+  background: none;
+}
+
+//body {
+//  background-color: black !important;
+//}
